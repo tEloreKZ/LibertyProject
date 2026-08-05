@@ -1,0 +1,524 @@
+{
+  "format": 1,
+  "restore": {
+    "G:\\ProjectLiberty\\LibertyProject\\src\\Core\\ProjectLiberty.Core.csproj": {}
+  },
+  "projects": {
+    "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj",
+        "projectName": "ProjectLiberty.Abstractions",
+        "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "G:\\ProjectLiberty\\LibertyProject\\src\\Configuration\\ProjectLiberty.Configuration.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\ProjectLiberty\\LibertyProject\\src\\Configuration\\ProjectLiberty.Configuration.csproj",
+        "projectName": "ProjectLiberty.Configuration",
+        "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Configuration\\ProjectLiberty.Configuration.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Configuration\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[8.0.5, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "G:\\ProjectLiberty\\LibertyProject\\src\\Core\\ProjectLiberty.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\ProjectLiberty\\LibertyProject\\src\\Core\\ProjectLiberty.Core.csproj",
+        "projectName": "ProjectLiberty.Core",
+        "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Core\\ProjectLiberty.Core.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Core\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj"
+              },
+              "G:\\ProjectLiberty\\LibertyProject\\src\\Configuration\\ProjectLiberty.Configuration.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Configuration\\ProjectLiberty.Configuration.csproj"
+              },
+              "G:\\ProjectLiberty\\LibertyProject\\src\\EventBus\\ProjectLiberty.EventBus.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\EventBus\\ProjectLiberty.EventBus.csproj"
+              },
+              "G:\\ProjectLiberty\\LibertyProject\\src\\GameHost\\ProjectLiberty.GameHost.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\GameHost\\ProjectLiberty.GameHost.csproj"
+              },
+              "G:\\ProjectLiberty\\LibertyProject\\src\\Localization\\ProjectLiberty.Localization.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Localization\\ProjectLiberty.Localization.csproj"
+              },
+              "G:\\ProjectLiberty\\LibertyProject\\src\\Logging\\ProjectLiberty.Logging.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Logging\\ProjectLiberty.Logging.csproj"
+              },
+              "G:\\ProjectLiberty\\LibertyProject\\src\\PluginSystem\\ProjectLiberty.PluginSystem.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\PluginSystem\\ProjectLiberty.PluginSystem.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "G:\\ProjectLiberty\\LibertyProject\\src\\EventBus\\ProjectLiberty.EventBus.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\ProjectLiberty\\LibertyProject\\src\\EventBus\\ProjectLiberty.EventBus.csproj",
+        "projectName": "ProjectLiberty.EventBus",
+        "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\EventBus\\ProjectLiberty.EventBus.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "G:\\ProjectLiberty\\LibertyProject\\src\\EventBus\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "G:\\ProjectLiberty\\LibertyProject\\src\\GameHost\\ProjectLiberty.GameHost.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\ProjectLiberty\\LibertyProject\\src\\GameHost\\ProjectLiberty.GameHost.csproj",
+        "projectName": "ProjectLiberty.GameHost",
+        "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\GameHost\\ProjectLiberty.GameHost.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "G:\\ProjectLiberty\\LibertyProject\\src\\GameHost\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "G:\\ProjectLiberty\\LibertyProject\\src\\Localization\\ProjectLiberty.Localization.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\ProjectLiberty\\LibertyProject\\src\\Localization\\ProjectLiberty.Localization.csproj",
+        "projectName": "ProjectLiberty.Localization",
+        "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Localization\\ProjectLiberty.Localization.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Localization\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "G:\\ProjectLiberty\\LibertyProject\\src\\Logging\\ProjectLiberty.Logging.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\ProjectLiberty\\LibertyProject\\src\\Logging\\ProjectLiberty.Logging.csproj",
+        "projectName": "ProjectLiberty.Logging",
+        "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Logging\\ProjectLiberty.Logging.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Logging\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "G:\\ProjectLiberty\\LibertyProject\\src\\PluginSystem\\ProjectLiberty.PluginSystem.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "G:\\ProjectLiberty\\LibertyProject\\src\\PluginSystem\\ProjectLiberty.PluginSystem.csproj",
+        "projectName": "ProjectLiberty.PluginSystem",
+        "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\PluginSystem\\ProjectLiberty.PluginSystem.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "G:\\ProjectLiberty\\LibertyProject\\src\\PluginSystem\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj": {
+                "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

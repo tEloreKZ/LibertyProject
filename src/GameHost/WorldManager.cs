@@ -1,3 +1,4 @@
+using ProjectLiberty.Abstractions.Entities;
 using ProjectLiberty.Abstractions.GameHost;
 using ProjectLiberty.Abstractions.Logging;
 

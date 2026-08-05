@@ -5,7 +5,7 @@ namespace ProjectLiberty.Core.DependencyInjection;
 /// <summary>
 /// Service container for dependency injection.
 /// </summary>
-public class ServiceContainer : IDisposable
+public class ServiceContainer : IServiceProvider, IDisposable
 {
     private readonly Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
     private readonly Dictionary<Type, Func<IServiceProvider, object>> _transients = new Dictionary<Type, Func<IServiceProvider, object>>();

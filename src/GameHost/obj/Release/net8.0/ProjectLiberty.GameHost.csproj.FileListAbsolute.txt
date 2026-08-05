@@ -1,0 +1,16 @@
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\ProjectLiberty.GameHost.csproj.AssemblyReference.cache
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\ProjectLiberty.GameHost.GeneratedMSBuildEditorConfig.editorconfig
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\ProjectLiberty.GameHost.AssemblyInfoInputs.cache
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\ProjectLiberty.GameHost.AssemblyInfo.cs
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\ProjectLiberty.GameHost.csproj.CoreCompileInputs.cache
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\ProjectLiberty.GameHost.sourcelink.json
+G:\ProjectLiberty\LibertyProject\src\GameHost\bin\Release\net8.0\ProjectLiberty.GameHost.deps.json
+G:\ProjectLiberty\LibertyProject\src\GameHost\bin\Release\net8.0\ProjectLiberty.GameHost.dll
+G:\ProjectLiberty\LibertyProject\src\GameHost\bin\Release\net8.0\ProjectLiberty.GameHost.pdb
+G:\ProjectLiberty\LibertyProject\src\GameHost\bin\Release\net8.0\ProjectLiberty.Abstractions.dll
+G:\ProjectLiberty\LibertyProject\src\GameHost\bin\Release\net8.0\ProjectLiberty.Abstractions.pdb
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\ProjectL.5B353AA6.Up2Date
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\ProjectLiberty.GameHost.dll
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\refint\ProjectLiberty.GameHost.dll
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\ProjectLiberty.GameHost.pdb
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net8.0\ref\ProjectLiberty.GameHost.dll

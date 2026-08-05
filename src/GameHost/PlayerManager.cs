@@ -50,7 +50,7 @@ public class PlayerManager : IPlayerManager
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
         public bool Exists { get; private set; } = true;
-        public IPed Character { get; } = new PedEntity(0, new Vector3(0, 0, 0));
+        public IPed Character { get; } = new SimplePed(0, new Vector3(0, 0, 0));
         public int Health { get; set; } = 100;
         public int Armor { get; set; } = 0;
         public string CurrentWeapon { get; set; } = "pistol";
@@ -62,6 +62,38 @@ public class PlayerManager : IPlayerManager
             Position = position;
         }
 
+        public void Delete()
+        {
+            Exists = false;
+        }
+    }
+
+    private class SimplePed : IPed
+    {
+        public int Handle { get; }
+        public EntityType Type => EntityType.Ped;
+        public Vector3 Position { get; set; }
+        public Vector3 Rotation { get; set; }
+        public bool Exists { get; private set; } = true;
+        public string Model { get; set; } = "default";
+        public int Health { get; set; } = 100;
+        public int Armor { get; set; } = 0;
+        public bool CanFight { get; set; } = true;
+        public bool CanUseWeapons { get; set; } = true;
+        public bool CanRagdoll { get; set; } = true;
+
+        public SimplePed(int handle, Vector3 position)
+        {
+            Handle = handle;
+            Position = position;
+        }
+
+        public IVehicle? GetCurrentVehicle() => null;
+        public void PlayAnimation(string animDict, string animName, float duration) { }
+        public void StopAnimation() { }
+        public void FollowPlayer() { }
+        public void Wander() { }
+        public void Flee() { }
         public void Delete()
         {
             Exists = false;

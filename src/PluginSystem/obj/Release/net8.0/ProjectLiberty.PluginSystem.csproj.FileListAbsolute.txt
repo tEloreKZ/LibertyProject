@@ -1,0 +1,16 @@
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\ProjectLiberty.PluginSystem.csproj.AssemblyReference.cache
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\ProjectLiberty.PluginSystem.GeneratedMSBuildEditorConfig.editorconfig
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\ProjectLiberty.PluginSystem.AssemblyInfoInputs.cache
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\ProjectLiberty.PluginSystem.AssemblyInfo.cs
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\ProjectLiberty.PluginSystem.csproj.CoreCompileInputs.cache
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\ProjectLiberty.PluginSystem.sourcelink.json
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\bin\Release\net8.0\ProjectLiberty.PluginSystem.deps.json
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\bin\Release\net8.0\ProjectLiberty.PluginSystem.dll
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\bin\Release\net8.0\ProjectLiberty.PluginSystem.pdb
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\bin\Release\net8.0\ProjectLiberty.Abstractions.dll
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\bin\Release\net8.0\ProjectLiberty.Abstractions.pdb
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\ProjectL.923E9779.Up2Date
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\ProjectLiberty.PluginSystem.dll
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\refint\ProjectLiberty.PluginSystem.dll
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\ProjectLiberty.PluginSystem.pdb
+G:\ProjectLiberty\LibertyProject\src\PluginSystem\obj\Release\net8.0\ref\ProjectLiberty.PluginSystem.dll

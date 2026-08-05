@@ -1,3 +1,5 @@
+using ProjectLiberty.Abstractions.Entities;
+
 namespace ProjectLiberty.Abstractions.GameHost;
 
 /// <summary>

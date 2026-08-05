@@ -11,6 +11,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Abstractions\ProjectLiberty.Abstractions.csproj" />
+    <ProjectReference Include="..\Configuration\ProjectLiberty.Configuration.csproj" />
+    <ProjectReference Include="..\EventBus\ProjectLiberty.EventBus.csproj" />
+    <ProjectReference Include="..\GameHost\ProjectLiberty.GameHost.csproj" />
+    <ProjectReference Include="..\Localization\ProjectLiberty.Localization.csproj" />
+    <ProjectReference Include="..\Logging\ProjectLiberty.Logging.csproj" />
+    <ProjectReference Include="..\PluginSystem\ProjectLiberty.PluginSystem.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

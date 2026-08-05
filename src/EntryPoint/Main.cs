@@ -3,65 +3,81 @@ using ProjectLiberty.Core;
 namespace ProjectLiberty.EntryPoint;
 
 /// <summary>
-/// Main entry point for Project Liberty - loaded by ScriptHookVDotNet.
+/// Main entry point for Project Liberty - standalone entry point for testing.
 /// </summary>
-public class Main
+public class Program
 {
     private static Application? _application;
     private static ServiceBootstrap? _bootstrap;
+    private static bool _initialized = false;
 
-    /// <summary>
-    /// Called when the script is loaded by ScriptHookVDotNet.
-    /// </summary>
-    public static void OnScriptLoad()
+    public static void Main(string[] args)
     {
+        Console.WriteLine("Starting Project Liberty...");
+        Console.WriteLine($"Base directory: {AppDomain.CurrentDomain.BaseDirectory}");
+        
         try
         {
             var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             
             // Initialize bootstrap
+            Console.WriteLine("Initializing bootstrap...");
             _bootstrap = new ServiceBootstrap(baseDirectory);
             
             // Configure services
+            Console.WriteLine("Configuring services...");
             var container = _bootstrap.ConfigureServices();
             
             // Get application
+            Console.WriteLine("Getting application...");
             _application = container.GetService<Application>();
             
+            if (_application == null)
+            {
+                throw new Exception("Failed to get application from container");
+            }
+            
             // Initialize application
+            Console.WriteLine("Initializing application...");
             _application.Initialize();
             
             // Run application
+            Console.WriteLine("Running application...");
             _application.Run();
+            
+            _initialized = true;
+            
+            Console.WriteLine("Project Liberty initialized successfully");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to initialize Project Liberty: {ex.Message}");
-            Console.WriteLine(ex.StackTrace);
+            Console.WriteLine($"ERROR: Failed to initialize Project Liberty");
+            Console.WriteLine($"Message: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
         }
+        
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadLine();
+        
+        Shutdown();
     }
 
-    /// <summary>
-    /// Called when the script is unloaded by ScriptHookVDotNet.
-    /// </summary>
-    public static void OnScriptUnload()
+    private static void Shutdown()
     {
         try
         {
-            _application?.Shutdown();
-            _application?.Dispose();
+            Console.WriteLine("Shutting down...");
+            if (_initialized)
+            {
+                _application?.Shutdown();
+                _application?.Dispose();
+                _initialized = false;
+            }
+            Console.WriteLine("Shutdown complete");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to shutdown Project Liberty: {ex.Message}");
+            Console.WriteLine($"ERROR: Failed to shutdown Project Liberty: {ex.Message}");
         }
-    }
-
-    /// <summary>
-    /// Called every tick by ScriptHookVDotNet.
-    /// </summary>
-    public static void OnScriptTick()
-    {
-        // Tick is handled by the game loop
     }
 }

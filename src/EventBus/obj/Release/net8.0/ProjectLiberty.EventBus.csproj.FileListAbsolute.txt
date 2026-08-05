@@ -1,0 +1,16 @@
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\ProjectLiberty.EventBus.csproj.AssemblyReference.cache
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\ProjectLiberty.EventBus.GeneratedMSBuildEditorConfig.editorconfig
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\ProjectLiberty.EventBus.AssemblyInfoInputs.cache
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\ProjectLiberty.EventBus.AssemblyInfo.cs
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\ProjectLiberty.EventBus.csproj.CoreCompileInputs.cache
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\ProjectLiberty.EventBus.sourcelink.json
+G:\ProjectLiberty\LibertyProject\src\EventBus\bin\Release\net8.0\ProjectLiberty.EventBus.deps.json
+G:\ProjectLiberty\LibertyProject\src\EventBus\bin\Release\net8.0\ProjectLiberty.EventBus.dll
+G:\ProjectLiberty\LibertyProject\src\EventBus\bin\Release\net8.0\ProjectLiberty.EventBus.pdb
+G:\ProjectLiberty\LibertyProject\src\EventBus\bin\Release\net8.0\ProjectLiberty.Abstractions.dll
+G:\ProjectLiberty\LibertyProject\src\EventBus\bin\Release\net8.0\ProjectLiberty.Abstractions.pdb
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\ProjectL.B77452E8.Up2Date
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\ProjectLiberty.EventBus.dll
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\refint\ProjectLiberty.EventBus.dll
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\ProjectLiberty.EventBus.pdb
+G:\ProjectLiberty\LibertyProject\src\EventBus\obj\Release\net8.0\ref\ProjectLiberty.EventBus.dll

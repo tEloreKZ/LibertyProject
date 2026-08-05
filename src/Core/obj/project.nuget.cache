@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "7e6knU63kyY=",
+  "success": true,
+  "projectFilePath": "G:\\ProjectLiberty\\LibertyProject\\src\\Core\\ProjectLiberty.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\user\\.nuget\\packages\\system.text.json\\8.0.5\\system.text.json.8.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}

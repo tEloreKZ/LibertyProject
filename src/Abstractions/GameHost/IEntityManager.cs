@@ -1,3 +1,5 @@
+using ProjectLiberty.Abstractions.Entities;
+
 namespace ProjectLiberty.Abstractions.GameHost;
 
 /// <summary>
@@ -38,15 +40,4 @@ public interface IEntityManager
     /// </summary>
     /// <param name="handle">Entity handle.</param>
     void DeleteEntity(int handle);
-}
-
-/// <summary>
-/// Entity type enum.
-/// </summary>
-public enum EntityType
-{
-    Ped,
-    Vehicle,
-    Object,
-    Prop
 }

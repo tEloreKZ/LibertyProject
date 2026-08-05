@@ -1,3 +1,9 @@
+using ProjectLiberty.Abstractions.Configuration;
+using ProjectLiberty.Abstractions.GameHost;
+using ProjectLiberty.Abstractions.Events;
+using ProjectLiberty.Abstractions.Localization;
+using ProjectLiberty.Abstractions.Logging;
+
 namespace ProjectLiberty.Abstractions.Plugins;
 
 /// <summary>

@@ -115,7 +115,7 @@ public class Logger : ILogger, IDisposable
 
         var fileName = $"log_{DateTime.UtcNow:yyyyMMdd_HHmmss}.log";
         _currentLogFile = Path.Combine(_logDirectory, fileName);
-        _fileWriter = new StreamWriter(_currentLogFile, true);
+        _fileWriter = new StreamWriter(new FileStream(_currentLogFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite));
     }
 
     private void CleanOldLogFiles()

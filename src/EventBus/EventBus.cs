@@ -58,9 +58,13 @@ public class EventBus : IEventBus, IDisposable
 
         foreach (var registration in handlers)
         {
-            if (registration.Filter != null && !registration.Filter.ShouldHandle(@event))
+            if (registration.Filter != null)
             {
-                continue;
+                var filter = (IEventFilter<TEvent>)registration.Filter;
+                if (!filter.ShouldHandle(@event))
+                {
+                    continue;
+                }
             }
 
             try
@@ -89,9 +93,13 @@ public class EventBus : IEventBus, IDisposable
 
         foreach (var registration in handlers)
         {
-            if (registration.Filter != null && !registration.Filter.ShouldHandle(@event))
+            if (registration.Filter != null)
             {
-                continue;
+                var filter = (IEventFilter<TEvent>)registration.Filter;
+                if (!filter.ShouldHandle(@event))
+                {
+                    continue;
+                }
             }
 
             tasks.Add(Task.Run(async () =>

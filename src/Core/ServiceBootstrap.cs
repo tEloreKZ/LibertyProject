@@ -52,7 +52,7 @@ public class ServiceBootstrap
         container.RegisterSingleton<ILocalization>(localization);
 
         // Register event bus
-        var eventBus = new EventBus(logger);
+        var eventBus = new ProjectLiberty.EventBus.EventBus(logger);
         container.RegisterSingleton<IEventBus>(eventBus);
 
         // Register game host components
