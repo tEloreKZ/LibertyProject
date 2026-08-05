@@ -1,10 +1,10 @@
 {
   "version": 3,
   "targets": {
-    "net8.0": {
+    ".NETFramework,Version=v4.8": {
       "ProjectLiberty.Abstractions/1.0.0": {
         "type": "project",
-        "framework": ".NETCoreApp,Version=v8.0",
+        "framework": ".NETFramework,Version=v4.8",
         "compile": {
           "bin/placeholder/ProjectLiberty.Abstractions.dll": {}
         },
@@ -22,7 +22,7 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net8.0": [
+    ".NETFramework,Version=v4.8": [
       "ProjectLiberty.Abstractions >= 1.0.0"
     ]
   },
@@ -42,15 +42,14 @@
         "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
-        "net8.0"
+        "net48"
       ],
       "sources": {
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net8.0": {
-          "framework": "net8.0",
-          "targetAlias": "net8.0",
+        "net48": {
+          "targetAlias": "net48",
           "projectReferences": {
             "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj": {
               "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\Abstractions\\ProjectLiberty.Abstractions.csproj"
@@ -70,26 +69,9 @@
       }
     },
     "frameworks": {
-      "net8.0": {
-        "framework": "net8.0",
-        "targetAlias": "net8.0",
-        "imports": [
-          "net461",
-          "net462",
-          "net47",
-          "net471",
-          "net472",
-          "net48",
-          "net481"
-        ],
-        "assetTargetFallback": true,
-        "warn": true,
-        "frameworkReferences": {
-          "Microsoft.NETCore.App": {
-            "privateAssets": "all"
-          }
-        },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+      "net48": {
+        "targetAlias": "net48",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423\\RuntimeIdentifierGraph.json"
       }
     }
   }

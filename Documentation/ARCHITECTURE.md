@@ -27,6 +27,7 @@ Project Liberty follows Clean Architecture principles with clear separation betw
 - **Maintainable**: Clear boundaries and responsibilities
 - **Extensible**: New features can be added without modifying existing code
 - **Performance-Optimized**: Minimal overhead and efficient resource usage
+- **ScriptHookVDotNet Integrated**: Built for GTA V modding with .NET Framework 4.8
 
 ---
 

@@ -3,9 +3,24 @@ using ProjectLiberty.Abstractions.Logging;
 namespace ProjectLiberty.Core.DependencyInjection;
 
 /// <summary>
+/// Service container interface for dependency injection.
+/// </summary>
+public interface IServiceContainer : IServiceProvider
+{
+    void RegisterSingleton<TService>(TService instance) where TService : class;
+    void RegisterSingleton<TService>(Func<IServiceProvider, TService> factory) where TService : class;
+    void RegisterTransient<TService, TImplementation>()
+        where TService : class
+        where TImplementation : class, TService;
+    void RegisterTransient<TService>(Func<IServiceProvider, TService> factory) where TService : class;
+    TService GetService<TService>() where TService : class;
+    bool IsRegistered(Type serviceType);
+}
+
+/// <summary>
 /// Service container for dependency injection.
 /// </summary>
-public class ServiceContainer : IServiceProvider, IDisposable
+public class ServiceContainer : IServiceContainer, IDisposable
 {
     private readonly Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
     private readonly Dictionary<Type, Func<IServiceProvider, object>> _transients = new Dictionary<Type, Func<IServiceProvider, object>>();

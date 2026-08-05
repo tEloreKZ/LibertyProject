@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProjectLiberty.Configuration")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dc7fa5259521cbcfb26a6a4210a9e1226a7f420f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+22473e535d4021583788c5fce47a2bcbee2126cd")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProjectLiberty.Configuration")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProjectLiberty.Configuration")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

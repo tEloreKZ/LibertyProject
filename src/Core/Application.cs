@@ -1,88 +1,79 @@
+using ProjectLiberty.Abstractions.Configuration;
+using ProjectLiberty.Abstractions.Events;
 using ProjectLiberty.Abstractions.GameHost;
-using ProjectLiberty.Abstractions.IPC;
+using ProjectLiberty.Abstractions.Localization;
 using ProjectLiberty.Abstractions.Logging;
+using ProjectLiberty.Abstractions.Plugins;
 using ProjectLiberty.Core.DependencyInjection;
+using ProjectLiberty.PluginSystem;
 
 namespace ProjectLiberty.Core;
 
 /// <summary>
-/// Main application class - coordinates all systems.
+/// Main application class - manages the lifecycle of Project Liberty.
 /// </summary>
 public class Application : IDisposable
 {
-    private readonly ServiceContainer _serviceContainer;
+    private readonly IServiceContainer _container;
     private readonly ILogger _logger;
-    private IGameHost? _gameHost;
-    private IIPCService? _ipcService;
+    private readonly IGameHost _gameHost;
+    private readonly PluginManager _pluginManager;
     private bool _disposed;
+    private bool _initialized;
+    private bool _running;
 
-    public Application(ServiceContainer serviceContainer, ILogger logger)
+    public Application(IServiceContainer container)
     {
-        _serviceContainer = serviceContainer;
-        _logger = logger;
+        _container = container;
+        _logger = _container.GetService<ILogger>();
+        _gameHost = _container.GetService<IGameHost>();
+        _pluginManager = container.GetService<PluginManager>();
     }
 
-    /// <summary>
-    /// Initializes the application.
-    /// </summary>
     public void Initialize()
     {
+        if (_initialized)
+            return;
+
         _logger.LogInformation("Initializing Project Liberty...");
 
-        // Get game host from container
-        _gameHost = _serviceContainer.GetService<IGameHost>();
-        
         // Initialize game host
         _gameHost.Initialize();
 
-        // Get IPC service
-        _ipcService = _serviceContainer.GetService<IIPCService>();
-        
-        // Start IPC server
-        _ipcService?.Start();
+        // Initialize plugins
+        _pluginManager.InitializePlugins();
 
-        _logger.LogInformation("Project Liberty initialized successfully");
+        _initialized = true;
+        _logger.LogInformation("Project Liberty initialized");
     }
 
-    /// <summary>
-    /// Runs the application.
-    /// </summary>
     public void Run()
     {
-        _logger.LogInformation("Starting Project Liberty...");
+        if (!_initialized)
+            throw new InvalidOperationException("Application not initialized");
 
-        if (_gameHost == null)
-        {
-            _logger.LogError("Game host not initialized");
+        if (_running)
             return;
-        }
 
-        // Start game loop
-        _gameHost.GameLoop.Start();
-
-        _logger.LogInformation("Project Liberty started");
+        _logger.LogInformation("Starting Project Liberty...");
+        _running = true;
     }
 
-    /// <summary>
-    /// Shuts down the application.
-    /// </summary>
     public void Shutdown()
     {
+        if (!_initialized || !_running)
+            return;
+
         _logger.LogInformation("Shutting down Project Liberty...");
 
-        // Stop IPC server
-        _ipcService?.Stop();
+        // Shutdown game host
+        _gameHost.Shutdown();
 
-        if (_gameHost != null)
-        {
-            // Stop game loop
-            _gameHost.GameLoop.Stop();
-            
-            // Shutdown game host
-            _gameHost.Shutdown();
-        }
+        // Dispose plugin manager
+        _pluginManager?.Dispose();
 
-        _logger.LogInformation("Project Liberty shut down successfully");
+        _running = false;
+        _logger.LogInformation("Project Liberty shut down");
     }
 
     public void Dispose()
@@ -91,7 +82,8 @@ public class Application : IDisposable
             return;
 
         Shutdown();
-        _serviceContainer.Dispose();
+
+        _pluginManager?.Dispose();
         _disposed = true;
     }
 }

@@ -1,4 +1,3 @@
-using ProjectLiberty.Abstractions.IPC;
 using ProjectLiberty.Abstractions.Logging;
 using ProjectLiberty.Core;
 
@@ -11,7 +10,6 @@ public class Program
 {
     private static Application? _application;
     private static ServiceBootstrap? _bootstrap;
-    private static IIPCService? _ipcService;
     private static bool _initialized = false;
 
     public static void Main(string[] args)
@@ -40,15 +38,6 @@ public class Program
                 throw new Exception("Failed to get application from container");
             }
             
-            // Get IPC service
-            Console.WriteLine("Getting IPC service...");
-            _ipcService = container.GetService<IIPCService>();
-            
-            if (_ipcService != null)
-            {
-                _ipcService.MessageReceived += OnIPCMessageReceived;
-            }
-            
             // Initialize application
             Console.WriteLine("Initializing application...");
             _application.Initialize();
@@ -60,7 +49,6 @@ public class Program
             _initialized = true;
             
             Console.WriteLine("Project Liberty initialized successfully");
-            Console.WriteLine("IPC Server running - waiting for ScriptHookVDotNet connection...");
         }
         catch (Exception ex)
         {
@@ -73,18 +61,6 @@ public class Program
         Console.ReadLine();
         
         Shutdown();
-    }
-
-    private static void OnIPCMessageReceived(object? sender, IPCMessageEventArgs e)
-    {
-        Console.WriteLine($"IPC Message: {e.Message}");
-        
-        // Handle different message types
-        if (e.Message.StartsWith("PLAYER_POS:"))
-        {
-            var coords = e.Message.Substring("PLAYER_POS:".Length).Split(',');
-            Console.WriteLine($"  Player Position: X={coords[0]}, Y={coords[1]}, Z={coords[2]}");
-        }
     }
 
     private static void Shutdown()

@@ -1,7 +1,7 @@
 using GTA;
 using GTA.Native;
 using GTA.UI;
-using ProjectLiberty.LibertyScript.IPC;
+using ProjectLiberty.Core;
 using System.Diagnostics;
 
 namespace ProjectLiberty.LibertyScript;
@@ -11,10 +11,9 @@ namespace ProjectLiberty.LibertyScript;
 /// </summary>
 public class LibertyScript : Script
 {
+    private static Application? _application;
+    private static ServiceBootstrap? _bootstrap;
     private static bool _initialized = false;
-    private static NamedPipeClient? _ipcClient;
-    private static DateTime _lastPositionUpdate = DateTime.MinValue;
-    private static readonly TimeSpan _positionUpdateInterval = TimeSpan.FromMilliseconds(500); // Update every 500ms
 
     public LibertyScript()
     {
@@ -30,44 +29,38 @@ public class LibertyScript : Script
     {
         try
         {
-            // Try to connect to .NET 8.0 system via IPC
-            _ipcClient = new NamedPipeClient();
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             
-            if (_ipcClient.Connect())
+            // Initialize bootstrap
+            _bootstrap = new ServiceBootstrap(baseDirectory);
+            
+            // Configure services
+            var container = _bootstrap.ConfigureServices();
+            
+            // Get application
+            _application = container.GetService<Application>();
+            
+            if (_application == null)
             {
-                Notification.Show("~g~Project Liberty~w~ connected to core system");
-                Screen.ShowSubtitle("Project Liberty v1.0 - Connected", 5000);
-                
-                _ipcClient.MessageReceived += OnIPCMessageReceived;
-                _initialized = true;
+                Notification.Show("~r~Failed to get application from container");
+                return;
             }
-            else
-            {
-                Notification.Show("~y~Project Liberty~w~ - Core system not running");
-                Screen.ShowSubtitle("Project Liberty v1.0 - Standalone Mode", 5000);
-                Screen.ShowSubtitle("Start ProjectLiberty.EntryPoint.exe first", 5000);
-            }
+            
+            // Initialize application
+            _application.Initialize();
+            
+            // Run application
+            _application.Run();
+            
+            _initialized = true;
+            
+            Notification.Show("~g~Project Liberty~w~ initialized successfully");
+            Debug.WriteLine("Project Liberty initialized successfully");
         }
         catch (Exception ex)
         {
-            Notification.Show($"~r~Error: {ex.Message}");
-            Screen.ShowSubtitle($"Error: {ex.Message}", 5000);
+            Notification.Show($"~r~Failed to initialize Project Liberty: {ex.Message}");
             Debug.WriteLine($"Initialize error: {ex}");
-        }
-    }
-
-    private void OnIPCMessageReceived(string message)
-    {
-        // Handle messages from .NET 8.0 system
-        try
-        {
-            // Disabled subtitle to avoid conflicts with console
-            // Screen.ShowSubtitle($"IPC: {message}", 3000);
-            Debug.WriteLine($"IPC Received: {message}");
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"OnIPCMessageReceived error: {ex}");
         }
     }
 
@@ -77,9 +70,11 @@ public class LibertyScript : Script
         {
             if (_initialized)
             {
-                _ipcClient?.Disconnect();
-                Notification.Show("~y~Project Liberty~w~ disconnected");
+                _application?.Shutdown();
+                _application?.Dispose();
                 _initialized = false;
+                Notification.Show("~y~Project Liberty~w~ shut down");
+                Debug.WriteLine("Project Liberty shut down");
             }
         }
         catch (Exception ex)
@@ -90,31 +85,7 @@ public class LibertyScript : Script
 
     private void OnTick(object sender, EventArgs e)
     {
-        try
-        {
-            // Send game state to .NET 8.0 system if connected
-            if (_initialized && _ipcClient != null && _ipcClient.IsConnected)
-            {
-                var now = DateTime.UtcNow;
-                
-                // Throttle position updates to every 500ms
-                if (now - _lastPositionUpdate >= _positionUpdateInterval)
-                {
-                    var player = Game.Player.Character;
-                    if (player != null && player.Exists())
-                    {
-                        var pos = player.Position;
-                        var message = $"PLAYER_POS:{pos.X:F2},{pos.Y:F2},{pos.Z:F2}";
-                        _ipcClient.SendMessage(message);
-                        _lastPositionUpdate = now;
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"OnTick error: {ex}");
-            // Don't crash on tick errors
-        }
+        // Tick logic for ScriptHookVDotNet
+        // The game loop is handled by the GameLoop in Project Liberty
     }
 }

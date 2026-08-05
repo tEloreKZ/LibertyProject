@@ -17,6 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Core\ProjectLiberty.Core.csproj" />
+    <ProjectReference Include="..\GameHost\ProjectLiberty.GameHost.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ScriptHookVDotNet3" Version="3.6.0" />
   </ItemGroup>
 

@@ -1,0 +1,10 @@
+G:\ProjectLiberty\LibertyProject\src\Abstractions\bin\Release\net48\ProjectLiberty.Abstractions.dll
+G:\ProjectLiberty\LibertyProject\src\Abstractions\bin\Release\net48\ProjectLiberty.Abstractions.pdb
+G:\ProjectLiberty\LibertyProject\src\Abstractions\obj\Release\net48\ProjectLiberty.Abstractions.csproj.AssemblyReference.cache
+G:\ProjectLiberty\LibertyProject\src\Abstractions\obj\Release\net48\ProjectLiberty.Abstractions.GeneratedMSBuildEditorConfig.editorconfig
+G:\ProjectLiberty\LibertyProject\src\Abstractions\obj\Release\net48\ProjectLiberty.Abstractions.AssemblyInfoInputs.cache
+G:\ProjectLiberty\LibertyProject\src\Abstractions\obj\Release\net48\ProjectLiberty.Abstractions.AssemblyInfo.cs
+G:\ProjectLiberty\LibertyProject\src\Abstractions\obj\Release\net48\ProjectLiberty.Abstractions.csproj.CoreCompileInputs.cache
+G:\ProjectLiberty\LibertyProject\src\Abstractions\obj\Release\net48\ProjectLiberty.Abstractions.sourcelink.json
+G:\ProjectLiberty\LibertyProject\src\Abstractions\obj\Release\net48\ProjectLiberty.Abstractions.dll
+G:\ProjectLiberty\LibertyProject\src\Abstractions\obj\Release\net48\ProjectLiberty.Abstractions.pdb

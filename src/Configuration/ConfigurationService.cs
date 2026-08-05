@@ -1,4 +1,4 @@
-using System.Text.Json;
+using Newtonsoft.Json;
 using ProjectLiberty.Abstractions.Configuration;
 using ProjectLiberty.Abstractions.Logging;
 
@@ -96,7 +96,7 @@ public class ConfigurationService : IConfiguration, IDisposable
             try
             {
                 var json = File.ReadAllText(jsonFile);
-                var config = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                var config = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
                 if (config != null)
                 {
@@ -132,7 +132,7 @@ public class ConfigurationService : IConfiguration, IDisposable
             coreConfig[kvp.Key] = kvp.Value;
         }
 
-        var json = JsonSerializer.Serialize(coreConfig, new JsonSerializerOptions { WriteIndented = true });
+        var json = JsonConvert.SerializeObject(coreConfig, Formatting.Indented);
         File.WriteAllText(Path.Combine(_configDirectory, "core.json"), json);
     }
 

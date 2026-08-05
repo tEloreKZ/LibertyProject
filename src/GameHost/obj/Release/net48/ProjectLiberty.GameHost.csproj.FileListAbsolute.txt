@@ -1,0 +1,13 @@
+G:\ProjectLiberty\LibertyProject\src\GameHost\bin\Release\net48\ProjectLiberty.GameHost.dll
+G:\ProjectLiberty\LibertyProject\src\GameHost\bin\Release\net48\ProjectLiberty.GameHost.pdb
+G:\ProjectLiberty\LibertyProject\src\GameHost\bin\Release\net48\ProjectLiberty.Abstractions.dll
+G:\ProjectLiberty\LibertyProject\src\GameHost\bin\Release\net48\ProjectLiberty.Abstractions.pdb
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net48\ProjectLiberty.GameHost.csproj.AssemblyReference.cache
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net48\ProjectLiberty.GameHost.GeneratedMSBuildEditorConfig.editorconfig
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net48\ProjectLiberty.GameHost.AssemblyInfoInputs.cache
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net48\ProjectLiberty.GameHost.AssemblyInfo.cs
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net48\ProjectLiberty.GameHost.csproj.CoreCompileInputs.cache
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net48\ProjectLiberty.GameHost.sourcelink.json
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net48\ProjectL.5B353AA6.Up2Date
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net48\ProjectLiberty.GameHost.dll
+G:\ProjectLiberty\LibertyProject\src\GameHost\obj\Release\net48\ProjectLiberty.GameHost.pdb

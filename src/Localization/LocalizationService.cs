@@ -1,4 +1,4 @@
-using System.Text.Json;
+using Newtonsoft.Json;
 using ProjectLiberty.Abstractions.Localization;
 using ProjectLiberty.Abstractions.Logging;
 
@@ -125,7 +125,7 @@ public class LocalizationService : ILocalization, IDisposable
                 try
                 {
                     var json = File.ReadAllText(jsonFile);
-                    var translations = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                    var translations = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
 
                     if (translations != null)
                     {
