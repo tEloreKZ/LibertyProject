@@ -51,17 +51,17 @@ Project Liberty is currently in the Architecture Design Phase. All core document
 - [x] Write EVENT_BUS.md
 - [x] Write PLUGIN_SDK.md
 - [x] Write LOCALIZATION.md
-- [ ] Write CONFIGURATION.md
-- [ ] Write SAVE_SYSTEM.md
-- [ ] Write PERFORMANCE.md
-- [ ] Write SCRIPTING_API.md
-- [ ] Write DISPATCH.md
-- [ ] Write TRAFFIC_STOPS.md
-- [ ] Write CALL_OUTS.md
-- [ ] Write ARREST_SYSTEM.md
-- [ ] Write AI_SYSTEM.md
-- [ ] Write CONTRIBUTING.md
-- [ ] Write LICENSE.md
+- [x]rite CONFIGURATION.md
+- [x]rite SAVE_SYSTEM.md
+- [x] Write PERFORMANCE.md
+- [x] Write SCRIPTING_API.md
+- [x] Write DISPATCH.md
+- [x] Write TRAFFIC_STOPS.md
+- [x] Write CALL_OUTS.md
+- [x] Write ARREST_SYSTEM.md
+- [x] Write AI_SYSTEM.md
+- [x] Write CONTRIBUTING.md
+- [x] Write LICENSE.md
 - [ ] Create solution file
 - [ ] Set up build system
 - [ ] Configure CI/CD
