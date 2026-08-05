@@ -51,8 +51,8 @@ Project Liberty is currently in the Architecture Design Phase. All core document
 - [x] Write EVENT_BUS.md
 - [x] Write PLUGIN_SDK.md
 - [x] Write LOCALIZATION.md
-- [x]rite CONFIGURATION.md
-- [x]rite SAVE_SYSTEM.md
+- [x] Write CONFIGURATION.md
+- [x] Write SAVE_SYSTEM.md
 - [x] Write PERFORMANCE.md
 - [x] Write SCRIPTING_API.md
 - [x] Write DISPATCH.md
