@@ -1,0 +1,91 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.8": {
+      "ScriptHookVDotNet3/3.6.0": {
+        "type": "package",
+        "compile": {
+          "lib/net48/ScriptHookVDotNet3.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net48/ScriptHookVDotNet3.dll": {
+            "related": ".xml"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ScriptHookVDotNet3/3.6.0": {
+      "sha512": "YccOvaMnHtFsWuGaZoi2Q/HFj8yyjNBN3b18pvcYYF4JcbjZxR1+I319qaMxRsvW1+iCbBZareQaeq6OpUHotw==",
+      "type": "package",
+      "path": "scripthookvdotnet3/3.6.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net48/ScriptHookVDotNet3.dll",
+        "lib/net48/ScriptHookVDotNet3.xml",
+        "scripthookvdotnet3.3.6.0.nupkg.sha512",
+        "scripthookvdotnet3.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.8": [
+      "ScriptHookVDotNet3 >= 3.6.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\user\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "G:\\ProjectLiberty\\LibertyProject\\src\\LibertyScript\\LibertyScript.csproj",
+      "projectName": "LibertyScript",
+      "projectPath": "G:\\ProjectLiberty\\LibertyProject\\src\\LibertyScript\\LibertyScript.csproj",
+      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+      "outputPath": "G:\\ProjectLiberty\\LibertyProject\\src\\LibertyScript\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net48"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net48": {
+          "targetAlias": "net48",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      }
+    },
+    "frameworks": {
+      "net48": {
+        "targetAlias": "net48",
+        "dependencies": {
+          "ScriptHookVDotNet3": {
+            "target": "Package",
+            "version": "[3.6.0, )"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

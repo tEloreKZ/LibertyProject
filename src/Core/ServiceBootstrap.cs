@@ -1,11 +1,13 @@
 using ProjectLiberty.Abstractions.Configuration;
 using ProjectLiberty.Abstractions.Events;
 using ProjectLiberty.Abstractions.GameHost;
+using ProjectLiberty.Abstractions.IPC;
 using ProjectLiberty.Abstractions.Localization;
 using ProjectLiberty.Abstractions.Logging;
 using ProjectLiberty.Abstractions.Plugins;
 using ProjectLiberty.Configuration;
 using ProjectLiberty.Core.DependencyInjection;
+using ProjectLiberty.Core.IPC;
 using ProjectLiberty.EventBus;
 using ProjectLiberty.GameHost;
 using ProjectLiberty.Localization;
@@ -54,6 +56,10 @@ public class ServiceBootstrap
         // Register event bus
         var eventBus = new ProjectLiberty.EventBus.EventBus(logger);
         container.RegisterSingleton<IEventBus>(eventBus);
+
+        // Register IPC service
+        var ipcServer = new NamedPipeServer(logger);
+        container.RegisterSingleton<IIPCService>(ipcServer);
 
         // Register game host components
         var nativeBridge = new NativeBridge(logger);

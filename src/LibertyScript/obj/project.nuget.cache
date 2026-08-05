@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ysv2KKh4kvQ=",
+  "success": true,
+  "projectFilePath": "G:\\ProjectLiberty\\LibertyProject\\src\\LibertyScript\\LibertyScript.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\user\\.nuget\\packages\\scripthookvdotnet3\\3.6.0\\scripthookvdotnet3.3.6.0.nupkg.sha512"
+  ],
+  "logs": []
+}

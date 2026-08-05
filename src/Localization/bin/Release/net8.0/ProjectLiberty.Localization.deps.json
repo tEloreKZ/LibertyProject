@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "ProjectLiberty.Localization/1.0.0": {
+        "dependencies": {
+          "ProjectLiberty.Abstractions": "1.0.0"
+        },
+        "runtime": {
+          "ProjectLiberty.Localization.dll": {}
+        }
+      },
+      "ProjectLiberty.Abstractions/1.0.0": {
+        "runtime": {
+          "ProjectLiberty.Abstractions.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ProjectLiberty.Localization/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ProjectLiberty.Abstractions/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

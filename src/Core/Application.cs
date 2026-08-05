@@ -1,4 +1,5 @@
 using ProjectLiberty.Abstractions.GameHost;
+using ProjectLiberty.Abstractions.IPC;
 using ProjectLiberty.Abstractions.Logging;
 using ProjectLiberty.Core.DependencyInjection;
 
@@ -12,6 +13,7 @@ public class Application : IDisposable
     private readonly ServiceContainer _serviceContainer;
     private readonly ILogger _logger;
     private IGameHost? _gameHost;
+    private IIPCService? _ipcService;
     private bool _disposed;
 
     public Application(ServiceContainer serviceContainer, ILogger logger)
@@ -32,6 +34,12 @@ public class Application : IDisposable
         
         // Initialize game host
         _gameHost.Initialize();
+
+        // Get IPC service
+        _ipcService = _serviceContainer.GetService<IIPCService>();
+        
+        // Start IPC server
+        _ipcService?.Start();
 
         _logger.LogInformation("Project Liberty initialized successfully");
     }
@@ -61,6 +69,9 @@ public class Application : IDisposable
     public void Shutdown()
     {
         _logger.LogInformation("Shutting down Project Liberty...");
+
+        // Stop IPC server
+        _ipcService?.Stop();
 
         if (_gameHost != null)
         {

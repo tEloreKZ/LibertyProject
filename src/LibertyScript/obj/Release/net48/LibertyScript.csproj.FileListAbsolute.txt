@@ -1,0 +1,12 @@
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net48\LibertyScript.csproj.AssemblyReference.cache
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net48\LibertyScript.GeneratedMSBuildEditorConfig.editorconfig
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net48\LibertyScript.AssemblyInfoInputs.cache
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net48\LibertyScript.AssemblyInfo.cs
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net48\LibertyScript.csproj.CoreCompileInputs.cache
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net48\LibertyScript.sourcelink.json
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\bin\Release\net48\LibertyScript.dll
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\bin\Release\net48\LibertyScript.pdb
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\bin\Release\net48\ScriptHookVDotNet3.dll
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net48\LibertyS.3D9F6369.Up2Date
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net48\LibertyScript.dll
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net48\LibertyScript.pdb
