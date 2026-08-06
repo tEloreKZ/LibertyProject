@@ -19,6 +19,7 @@
     <ProjectReference Include="..\Abstractions\ProjectLiberty.Abstractions.csproj" />
   </ItemGroup>
 
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>full</DebugType>
     <OutputPath>bin\Debug\</OutputPath>

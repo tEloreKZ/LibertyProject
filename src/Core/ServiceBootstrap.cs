@@ -20,10 +20,12 @@ namespace ProjectLiberty.Core;
 public class ServiceBootstrap
 {
     private readonly string _baseDirectory;
+    private readonly bool _useMockHost;
 
-    public ServiceBootstrap(string baseDirectory)
+    public ServiceBootstrap(string baseDirectory, bool useMockHost = false)
     {
         _baseDirectory = baseDirectory;
+        _useMockHost = useMockHost;
     }
 
     /// <summary>
@@ -56,7 +58,7 @@ public class ServiceBootstrap
         container.RegisterSingleton<IEventBus>(eventBus);
 
         // Register game host components
-        var nativeBridge = new NativeBridge(logger);
+        var nativeBridge = new NativeBridge(logger, useScriptHook: !_useMockHost);
         container.RegisterSingleton<INativeBridge>(nativeBridge);
 
         var gameLoop = new GameLoop(logger);
@@ -65,15 +67,6 @@ public class ServiceBootstrap
         var entityManager = new EntityManager(logger);
         container.RegisterSingleton<IEntityManager>(entityManager);
 
-        var playerManager = new PlayerManager(logger, entityManager);
-        container.RegisterSingleton<IPlayerManager>(playerManager);
-
-        var vehicleManager = new VehicleManager(logger, entityManager);
-        container.RegisterSingleton<IVehicleManager>(vehicleManager);
-
-        var pedManager = new PedManager(logger, entityManager);
-        container.RegisterSingleton<IPedManager>(pedManager);
-
         var worldManager = new WorldManager(logger);
         container.RegisterSingleton<IWorldManager>(worldManager);
 
@@ -81,16 +74,27 @@ public class ServiceBootstrap
         container.RegisterSingleton<INativeInvoker>(nativeInvoker);
 
         // Register game host
-        var gameHost = new ScriptHookHost(
-            logger,
-            nativeBridge,
-            gameLoop,
-            entityManager,
-            playerManager,
-            vehicleManager,
-            pedManager,
-            worldManager,
-            nativeInvoker);
+        IGameHost gameHost;
+        if (_useMockHost)
+        {
+            gameHost = new MockGameHost(
+                logger,
+                nativeBridge,
+                gameLoop,
+                entityManager,
+                worldManager,
+                nativeInvoker);
+        }
+        else
+        {
+            gameHost = new ScriptHookHost(
+                logger,
+                nativeBridge,
+                gameLoop,
+                entityManager,
+                worldManager,
+                nativeInvoker);
+        }
         container.RegisterSingleton<IGameHost>(gameHost);
 
         // Register plugin context

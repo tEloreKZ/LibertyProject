@@ -5,7 +5,8 @@ using ProjectLiberty.Abstractions.Logging;
 namespace ProjectLiberty.GameHost;
 
 /// <summary>
-/// Entity manager implementation.
+/// Entity manager implementation - basic pooling for plugin tracking.
+/// Use ScriptHookVDotNet directly for game entity operations.
 /// </summary>
 public class EntityManager : IEntityManager
 {
@@ -36,17 +37,7 @@ public class EntityManager : IEntityManager
     public IEntity CreateEntity(EntityType type, Vector3 position)
     {
         var handle = _nextHandle++;
-        IEntity entity;
-
-        // This would create actual game entities through native calls
-        // For now, create placeholder entities
-        entity = type switch
-        {
-            EntityType.Ped => new PedEntity(handle, position),
-            EntityType.Vehicle => new VehicleEntity(handle, position),
-            _ => new BaseEntity(handle, position, type)
-        };
-
+        var entity = new BaseEntity(handle, position, type);
         _entities[handle] = entity;
         _logger.LogDebug($"Created entity: {type} with handle {handle}");
         return entity;
@@ -79,40 +70,5 @@ public class EntityManager : IEntityManager
         {
             Exists = false;
         }
-    }
-
-    private class PedEntity : BaseEntity, IPed
-    {
-        public string Model { get; set; } = "default";
-        public int Health { get; set; } = 100;
-        public int Armor { get; set; } = 0;
-        public bool CanFight { get; set; } = true;
-        public bool CanUseWeapons { get; set; } = true;
-        public bool CanRagdoll { get; set; } = true;
-
-        public PedEntity(int handle, Vector3 position) : base(handle, position, EntityType.Ped) { }
-
-        public IVehicle? GetCurrentVehicle() => null;
-        public void PlayAnimation(string animDict, string animName, float duration) { }
-        public void StopAnimation() { }
-        public void FollowPlayer() { }
-        public void Wander() { }
-        public void Flee() { }
-    }
-
-    private class VehicleEntity : BaseEntity, IVehicle
-    {
-        public string Model { get; set; } = "default";
-        public int Health { get; set; } = 1000;
-        public float Speed { get; set; }
-        public float MaxSpeed { get; set; } = 100f;
-        public bool IsSirenOn { get; set; }
-        public bool IsEngineOn { get; set; } = true;
-
-        public VehicleEntity(int handle, Vector3 position) : base(handle, position, EntityType.Vehicle) { }
-
-        public IPed? GetDriver() => null;
-        public IEnumerable<IPed> GetPassengers() => Enumerable.Empty<IPed>();
-        public void DriveTo(Vector3 position, float speed) { }
     }
 }

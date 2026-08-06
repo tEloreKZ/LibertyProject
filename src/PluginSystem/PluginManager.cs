@@ -11,12 +11,16 @@ public class PluginManager : IDisposable
     private readonly Dictionary<string, IPlugin> _plugins = new Dictionary<string, IPlugin>();
     private readonly ILogger _logger;
     private readonly IPluginContext _pluginContext;
+    private readonly DependencyResolver _dependencyResolver;
+    private readonly VersionChecker _versionChecker;
     private bool _disposed;
 
     public PluginManager(ILogger logger, IPluginContext pluginContext)
     {
         _logger = logger;
         _pluginContext = pluginContext;
+        _dependencyResolver = new DependencyResolver(logger);
+        _versionChecker = new VersionChecker(logger, "1.0.0"); // Core version
     }
 
     /// <summary>
@@ -33,6 +37,13 @@ public class PluginManager : IDisposable
             return;
         }
 
+        // Check version compatibility
+        if (!_versionChecker.IsCompatible(plugin))
+        {
+            _logger.LogWarning($"Plugin {plugin.Manifest.Name} is not compatible with current core version");
+            return;
+        }
+
         try
         {
             plugin.SetContext(_pluginContext);
@@ -44,6 +55,36 @@ public class PluginManager : IDisposable
         {
             _logger.LogError(ex, $"Failed to load plugin: {pluginId}");
         }
+    }
+
+    /// <summary>
+    /// Loads multiple plugins with dependency resolution.
+    /// </summary>
+    /// <param name="plugins">Plugins to load.</param>
+    public void LoadPlugins(IEnumerable<IPlugin> plugins)
+    {
+        var pluginList = plugins.ToList();
+
+        // Validate dependencies
+        if (!_dependencyResolver.ValidateDependencies(pluginList))
+        {
+            _logger.LogWarning("Plugin dependency validation failed");
+            return;
+        }
+
+        // Filter compatible plugins
+        var compatiblePlugins = _versionChecker.FilterCompatible(pluginList);
+
+        // Resolve load order
+        var loadOrder = _dependencyResolver.ResolveLoadOrder(compatiblePlugins);
+
+        // Load in order
+        foreach (var plugin in loadOrder)
+        {
+            LoadPlugin(plugin);
+        }
+
+        _logger.LogInformation($"Loaded {loadOrder.Count} plugins in dependency order");
     }
 
     /// <summary>

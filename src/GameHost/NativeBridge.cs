@@ -9,11 +9,15 @@ namespace ProjectLiberty.GameHost;
 public class NativeBridge : INativeBridge
 {
     private readonly ILogger _logger;
+    private readonly NativeHashCache _hashCache;
+    private readonly bool _useScriptHook;
     private bool _initialized;
 
-    public NativeBridge(ILogger logger)
+    public NativeBridge(ILogger logger, bool useScriptHook = true)
     {
         _logger = logger;
+        _useScriptHook = useScriptHook;
+        _hashCache = new NativeHashCache(logger, useScriptHook);
     }
 
     public bool IsInitialized => _initialized;
@@ -21,15 +25,9 @@ public class NativeBridge : INativeBridge
     public void Initialize()
     {
         if (_initialized)
-        {
             return;
-        }
 
         _logger.LogInformation("Initializing NativeBridge...");
-        
-        // Initialize ScriptHookVDotNet native bridge
-        // This would typically call into ScriptHookVDotNet's native functions
-        
         _initialized = true;
         _logger.LogInformation("NativeBridge initialized");
     }
@@ -37,26 +35,21 @@ public class NativeBridge : INativeBridge
     public void Shutdown()
     {
         if (!_initialized)
-        {
             return;
-        }
 
         _logger.LogInformation("Shutting down NativeBridge...");
+        _hashCache.Clear();
         _initialized = false;
         _logger.LogInformation("NativeBridge shut down");
     }
 
     public string GetGameVersion()
     {
-        // This would call native function to get game version
-        // For now, return a placeholder
         return "1.0.0.0";
     }
 
     public ulong GetScriptHash(string nativeName)
     {
-        // This would call native function to get script hash
-        // For now, return a simple hash
-        return (ulong)nativeName.GetHashCode();
+        return _hashCache.GetHash(nativeName);
     }
 }

@@ -21,9 +21,9 @@ public class Program
         {
             var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             
-            // Initialize bootstrap
-            Console.WriteLine("Initializing bootstrap...");
-            _bootstrap = new ServiceBootstrap(baseDirectory);
+            // Initialize bootstrap with mock host for standalone testing
+            Console.WriteLine("Initializing bootstrap with MockGameHost...");
+            _bootstrap = new ServiceBootstrap(baseDirectory, useMockHost: true);
             
             // Configure services
             Console.WriteLine("Configuring services...");

@@ -2,6 +2,7 @@ namespace ProjectLiberty.Abstractions.GameHost;
 
 /// <summary>
 /// Main game host interface - provides access to game systems.
+/// Use ScriptHookVDotNet directly for game entity operations.
 /// </summary>
 public interface IGameHost
 {
@@ -9,47 +10,32 @@ public interface IGameHost
     /// Gets the native bridge for native game calls.
     /// </summary>
     INativeBridge NativeBridge { get; }
-    
+
     /// <summary>
     /// Gets the game loop for tick management.
     /// </summary>
     IGameLoop GameLoop { get; }
-    
+
     /// <summary>
-    /// Gets the entity manager.
+    /// Gets the entity manager for plugin entity tracking.
     /// </summary>
     IEntityManager EntityManager { get; }
-    
+
     /// <summary>
-    /// Gets the player manager.
-    /// </summary>
-    IPlayerManager PlayerManager { get; }
-    
-    /// <summary>
-    /// Gets the vehicle manager.
-    /// </summary>
-    IVehicleManager VehicleManager { get; }
-    
-    /// <summary>
-    /// Gets the ped manager.
-    /// </summary>
-    IPedManager PedManager { get; }
-    
-    /// <summary>
-    /// Gets the world manager.
+    /// Gets the world manager for world state.
     /// </summary>
     IWorldManager WorldManager { get; }
-    
+
     /// <summary>
     /// Gets the native invoker for native function calls.
     /// </summary>
     INativeInvoker NativeInvoker { get; }
-    
+
     /// <summary>
     /// Initializes the game host.
     /// </summary>
     void Initialize();
-    
+
     /// <summary>
     /// Shuts down the game host.
     /// </summary>

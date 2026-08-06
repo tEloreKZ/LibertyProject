@@ -5,7 +5,8 @@ using ProjectLiberty.Abstractions.Logging;
 namespace ProjectLiberty.GameHost;
 
 /// <summary>
-/// World manager implementation.
+/// World manager implementation - basic world state tracking.
+/// Use ScriptHookVDotNet directly for world operations.
 /// </summary>
 public class WorldManager : IWorldManager
 {

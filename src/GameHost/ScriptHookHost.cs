@@ -12,9 +12,6 @@ public class ScriptHookHost : IGameHost, IDisposable
     private readonly INativeBridge _nativeBridge;
     private readonly IGameLoop _gameLoop;
     private readonly IEntityManager _entityManager;
-    private readonly IPlayerManager _playerManager;
-    private readonly IVehicleManager _vehicleManager;
-    private readonly IPedManager _pedManager;
     private readonly IWorldManager _worldManager;
     private readonly INativeInvoker _nativeInvoker;
     private bool _disposed;
@@ -22,9 +19,6 @@ public class ScriptHookHost : IGameHost, IDisposable
     public INativeBridge NativeBridge => _nativeBridge;
     public IGameLoop GameLoop => _gameLoop;
     public IEntityManager EntityManager => _entityManager;
-    public IPlayerManager PlayerManager => _playerManager;
-    public IVehicleManager VehicleManager => _vehicleManager;
-    public IPedManager PedManager => _pedManager;
     public IWorldManager WorldManager => _worldManager;
     public INativeInvoker NativeInvoker => _nativeInvoker;
 
@@ -33,9 +27,6 @@ public class ScriptHookHost : IGameHost, IDisposable
         INativeBridge nativeBridge,
         IGameLoop gameLoop,
         IEntityManager entityManager,
-        IPlayerManager playerManager,
-        IVehicleManager vehicleManager,
-        IPedManager pedManager,
         IWorldManager worldManager,
         INativeInvoker nativeInvoker)
     {
@@ -43,9 +34,6 @@ public class ScriptHookHost : IGameHost, IDisposable
         _nativeBridge = nativeBridge;
         _gameLoop = gameLoop;
         _entityManager = entityManager;
-        _playerManager = playerManager;
-        _vehicleManager = vehicleManager;
-        _pedManager = pedManager;
         _worldManager = worldManager;
         _nativeInvoker = nativeInvoker;
     }

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProjectLiberty.PluginSystem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+22473e535d4021583788c5fce47a2bcbee2126cd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec11e4b64383d0c248da6e3dd133d7a649abab6c")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProjectLiberty.PluginSystem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProjectLiberty.PluginSystem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
