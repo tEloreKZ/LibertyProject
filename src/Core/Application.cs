@@ -93,4 +93,9 @@ public class Application : IDisposable
         _pluginManager?.Dispose();
         _disposed = true;
     }
+
+    public IServiceContainer GetContainer()
+    {
+        return _container;
+    }
 }

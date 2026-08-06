@@ -4,6 +4,7 @@ using ProjectLiberty.Abstractions.GameHost;
 using ProjectLiberty.Abstractions.Localization;
 using ProjectLiberty.Abstractions.Logging;
 using ProjectLiberty.Abstractions.Plugins;
+using ProjectLiberty.Abstractions.UI;
 using ProjectLiberty.Configuration;
 using ProjectLiberty.Core.DependencyInjection;
 using ProjectLiberty.EventBus;
@@ -11,6 +12,7 @@ using ProjectLiberty.GameHost;
 using ProjectLiberty.Localization;
 using ProjectLiberty.Logging;
 using ProjectLiberty.PluginSystem;
+using ProjectLiberty.UI;
 
 namespace ProjectLiberty.Core;
 
@@ -113,6 +115,10 @@ public class ServiceBootstrap
 
         var pluginManager = new PluginManager(logger, pluginContext);
         container.RegisterSingleton<PluginManager>(pluginManager);
+
+        // Register UI system
+        var menuManager = new MenuManager();
+        container.RegisterSingleton<IMenuManager>(menuManager);
 
         // Register application
         var application = new Application(container);

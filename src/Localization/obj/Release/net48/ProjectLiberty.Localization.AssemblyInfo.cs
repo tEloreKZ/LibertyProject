@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProjectLiberty.Localization")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b234e96119633c475ca2566ab5d674f0d7c1be71")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+64ae1289ff0d2bde8d1691d66550fb11b9fa8429")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProjectLiberty.Localization")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProjectLiberty.Localization")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

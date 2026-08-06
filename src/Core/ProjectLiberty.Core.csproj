@@ -23,6 +23,7 @@
     <ProjectReference Include="..\Localization\ProjectLiberty.Localization.csproj" />
     <ProjectReference Include="..\Logging\ProjectLiberty.Logging.csproj" />
     <ProjectReference Include="..\PluginSystem\ProjectLiberty.PluginSystem.csproj" />
+    <ProjectReference Include="..\UI\ProjectLiberty.UI.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

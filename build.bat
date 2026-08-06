@@ -85,6 +85,7 @@ copy "src\PluginSystem\bin\Release\net48\ProjectLiberty.PluginSystem.dll" "outpu
 copy "src\Localization\bin\Release\net48\ProjectLiberty.Localization.dll" "output\scripts\ProjectLiberty\Core\" >nul
 copy "src\Configuration\bin\Release\net48\ProjectLiberty.Configuration.dll" "output\scripts\ProjectLiberty\Core\" >nul
 copy "src\Logging\bin\Release\net48\ProjectLiberty.Logging.dll" "output\scripts\ProjectLiberty\Core\" >nul
+copy "src\UI\bin\Release\net48\ProjectLiberty.UI.dll" "output\scripts\ProjectLiberty\Core\" >nul
 
 echo Copying Newtonsoft.Json.dll to Core...
 for /r "src" %%f in (Newtonsoft.Json.dll) do (

@@ -27,3 +27,5 @@ G:\ProjectLiberty\LibertyProject\src\LibertyScript\bin\Release\net48\ProjectLibe
 G:\ProjectLiberty\LibertyProject\src\LibertyScript\bin\Release\net48\ProjectLiberty.Localization.pdb
 G:\ProjectLiberty\LibertyProject\src\LibertyScript\bin\Release\net48\ProjectLiberty.Logging.pdb
 G:\ProjectLiberty\LibertyProject\src\LibertyScript\bin\Release\net48\ProjectLiberty.PluginSystem.pdb
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\bin\Release\net48\ProjectLiberty.UI.dll
+G:\ProjectLiberty\LibertyProject\src\LibertyScript\bin\Release\net48\ProjectLiberty.UI.pdb

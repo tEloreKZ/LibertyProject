@@ -49,7 +49,8 @@
           "ProjectLiberty.GameHost": "1.0.0",
           "ProjectLiberty.Localization": "1.0.0",
           "ProjectLiberty.Logging": "1.0.0",
-          "ProjectLiberty.PluginSystem": "1.0.0"
+          "ProjectLiberty.PluginSystem": "1.0.0",
+          "ProjectLiberty.UI": "1.0.0"
         },
         "compile": {
           "bin/placeholder/ProjectLiberty.Core.dll": {}
@@ -122,6 +123,19 @@
         },
         "runtime": {
           "bin/placeholder/ProjectLiberty.PluginSystem.dll": {}
+        }
+      },
+      "ProjectLiberty.UI/1.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.8",
+        "dependencies": {
+          "ProjectLiberty.Abstractions": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ProjectLiberty.UI.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ProjectLiberty.UI.dll": {}
         }
       }
     },
@@ -173,7 +187,8 @@
           "ProjectLiberty.GameHost": "1.0.0",
           "ProjectLiberty.Localization": "1.0.0",
           "ProjectLiberty.Logging": "1.0.0",
-          "ProjectLiberty.PluginSystem": "1.0.0"
+          "ProjectLiberty.PluginSystem": "1.0.0",
+          "ProjectLiberty.UI": "1.0.0"
         },
         "compile": {
           "bin/placeholder/ProjectLiberty.Core.dll": {}
@@ -246,6 +261,19 @@
         },
         "runtime": {
           "bin/placeholder/ProjectLiberty.PluginSystem.dll": {}
+        }
+      },
+      "ProjectLiberty.UI/1.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.8",
+        "dependencies": {
+          "ProjectLiberty.Abstractions": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ProjectLiberty.UI.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ProjectLiberty.UI.dll": {}
         }
       }
     }
@@ -320,6 +348,11 @@
       "type": "project",
       "path": "../PluginSystem/ProjectLiberty.PluginSystem.csproj",
       "msbuildProject": "../PluginSystem/ProjectLiberty.PluginSystem.csproj"
+    },
+    "ProjectLiberty.UI/1.0.0": {
+      "type": "project",
+      "path": "../UI/ProjectLiberty.UI.csproj",
+      "msbuildProject": "../UI/ProjectLiberty.UI.csproj"
     }
   },
   "projectFileDependencyGroups": {

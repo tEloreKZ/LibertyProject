@@ -27,3 +27,5 @@ G:\ProjectLiberty\LibertyProject\src\EntryPoint\obj\Release\net48\ProjectLiberty
 G:\ProjectLiberty\LibertyProject\src\EntryPoint\obj\Release\net48\ProjectL.E9EE4E54.Up2Date
 G:\ProjectLiberty\LibertyProject\src\EntryPoint\obj\Release\net48\ProjectLiberty.EntryPoint.exe
 G:\ProjectLiberty\LibertyProject\src\EntryPoint\obj\Release\net48\ProjectLiberty.EntryPoint.pdb
+G:\ProjectLiberty\LibertyProject\src\EntryPoint\bin\Release\net48\ProjectLiberty.UI.dll
+G:\ProjectLiberty\LibertyProject\src\EntryPoint\bin\Release\net48\ProjectLiberty.UI.pdb

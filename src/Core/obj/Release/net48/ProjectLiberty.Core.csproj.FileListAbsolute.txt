@@ -24,3 +24,5 @@ G:\ProjectLiberty\LibertyProject\src\Core\obj\Release\net48\ProjectLiberty.Core.
 G:\ProjectLiberty\LibertyProject\src\Core\obj\Release\net48\ProjectL.1719352A.Up2Date
 G:\ProjectLiberty\LibertyProject\src\Core\obj\Release\net48\ProjectLiberty.Core.dll
 G:\ProjectLiberty\LibertyProject\src\Core\obj\Release\net48\ProjectLiberty.Core.pdb
+G:\ProjectLiberty\LibertyProject\src\Core\bin\Release\net48\ProjectLiberty.UI.dll
+G:\ProjectLiberty\LibertyProject\src\Core\bin\Release\net48\ProjectLiberty.UI.pdb
