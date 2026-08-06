@@ -18,6 +18,7 @@ public class Application : IDisposable
     private readonly ILogger _logger;
     private readonly IGameHost _gameHost;
     private readonly PluginManager _pluginManager;
+    private readonly PluginLoader _pluginLoader;
     private bool _disposed;
     private bool _initialized;
     private bool _running;
@@ -28,6 +29,7 @@ public class Application : IDisposable
         _logger = _container.GetService<ILogger>();
         _gameHost = _container.GetService<IGameHost>();
         _pluginManager = container.GetService<PluginManager>();
+        _pluginLoader = container.GetService<PluginLoader>();
     }
 
     public void Initialize()
@@ -39,6 +41,11 @@ public class Application : IDisposable
 
         // Initialize game host
         _gameHost.Initialize();
+
+        // Discover and load plugins
+        _logger.LogInformation("Initializing plugins...");
+        var discoveredPlugins = _pluginLoader.DiscoverPlugins();
+        _pluginManager.LoadPlugins(discoveredPlugins);
 
         // Initialize plugins
         _pluginManager.InitializePlugins();

@@ -11,11 +11,37 @@ public class PluginLoader
 {
     private readonly ILogger _logger;
     private readonly string _pluginsDirectory;
+    private readonly string _coreDirectory;
 
     public PluginLoader(ILogger logger, string pluginsDirectory)
     {
         _logger = logger;
         _pluginsDirectory = pluginsDirectory;
+        _coreDirectory = Path.Combine(Path.GetDirectoryName(pluginsDirectory) ?? "", "Core");
+
+        // Setup assembly resolve to load dependencies from Core directory
+        AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
+    }
+
+    private Assembly? OnAssemblyResolve(object? sender, ResolveEventArgs args)
+    {
+        try
+        {
+            var assemblyName = new AssemblyName(args.Name).Name;
+            var coreDllPath = Path.Combine(_coreDirectory, $"{assemblyName}.dll");
+
+            if (File.Exists(coreDllPath))
+            {
+                _logger.LogDebug($"Loading assembly from Core: {assemblyName}");
+                return Assembly.LoadFrom(coreDllPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"Failed to resolve assembly {args.Name}: {ex.Message}");
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -32,10 +58,20 @@ public class PluginLoader
             return plugins;
         }
 
-        var dllFiles = Directory.GetFiles(_pluginsDirectory, "*.dll", SearchOption.AllDirectories);
+        // Look for plugin subdirectories
+        var pluginDirectories = Directory.GetDirectories(_pluginsDirectory);
 
-        foreach (var dllFile in dllFiles)
+        foreach (var pluginDir in pluginDirectories)
         {
+            var pluginName = Path.GetFileName(pluginDir);
+            var dllFile = Path.Combine(pluginDir, $"{pluginName}.dll");
+
+            if (!File.Exists(dllFile))
+            {
+                _logger.LogWarning($"Plugin DLL not found: {dllFile}");
+                continue;
+            }
+
             try
             {
                 var assembly = Assembly.LoadFrom(dllFile);
@@ -47,7 +83,7 @@ public class PluginLoader
                     try
                     {
                         var plugin = (IPlugin)Activator.CreateInstance(pluginType)!;
-                        
+
                         if (plugin.Discover())
                         {
                             plugins.Add(plugin);

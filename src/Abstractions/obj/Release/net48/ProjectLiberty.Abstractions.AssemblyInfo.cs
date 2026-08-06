@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProjectLiberty.Abstractions")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec11e4b64383d0c248da6e3dd133d7a649abab6c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b234e96119633c475ca2566ab5d674f0d7c1be71")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProjectLiberty.Abstractions")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProjectLiberty.Abstractions")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

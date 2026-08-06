@@ -70,40 +70,49 @@ copy "Languages\ru\core.json" "output\Languages\ru\" >nul
 
 echo Creating scripts deployment folder...
 mkdir "output\scripts"
-copy "src\Abstractions\bin\Release\net48\ProjectLiberty.Abstractions.dll" "output\scripts\" >nul
-copy "src\Core\bin\Release\net48\ProjectLiberty.Core.dll" "output\scripts\" >nul
-copy "src\GameHost\bin\Release\net48\ProjectLiberty.GameHost.dll" "output\scripts\" >nul
-copy "src\EventBus\bin\Release\net48\ProjectLiberty.EventBus.dll" "output\scripts\" >nul
-copy "src\PluginSystem\bin\Release\net48\ProjectLiberty.PluginSystem.dll" "output\scripts\" >nul
-copy "src\Localization\bin\Release\net48\ProjectLiberty.Localization.dll" "output\scripts\" >nul
-copy "src\Configuration\bin\Release\net48\ProjectLiberty.Configuration.dll" "output\scripts\" >nul
-copy "src\Logging\bin\Release\net48\ProjectLiberty.Logging.dll" "output\scripts\" >nul
+mkdir "output\scripts\ProjectLiberty"
+mkdir "output\scripts\ProjectLiberty\Core"
+mkdir "output\scripts\ProjectLiberty\Config"
+mkdir "output\scripts\ProjectLiberty\Logs"
+mkdir "output\scripts\ProjectLiberty\Plugins"
+
+echo Copying Core DLLs...
+copy "src\Abstractions\bin\Release\net48\ProjectLiberty.Abstractions.dll" "output\scripts\ProjectLiberty\Core\" >nul
+copy "src\Core\bin\Release\net48\ProjectLiberty.Core.dll" "output\scripts\ProjectLiberty\Core\" >nul
+copy "src\GameHost\bin\Release\net48\ProjectLiberty.GameHost.dll" "output\scripts\ProjectLiberty\Core\" >nul
+copy "src\EventBus\bin\Release\net48\ProjectLiberty.EventBus.dll" "output\scripts\ProjectLiberty\Core\" >nul
+copy "src\PluginSystem\bin\Release\net48\ProjectLiberty.PluginSystem.dll" "output\scripts\ProjectLiberty\Core\" >nul
+copy "src\Localization\bin\Release\net48\ProjectLiberty.Localization.dll" "output\scripts\ProjectLiberty\Core\" >nul
+copy "src\Configuration\bin\Release\net48\ProjectLiberty.Configuration.dll" "output\scripts\ProjectLiberty\Core\" >nul
+copy "src\Logging\bin\Release\net48\ProjectLiberty.Logging.dll" "output\scripts\ProjectLiberty\Core\" >nul
+
+echo Copying Newtonsoft.Json.dll to Core...
+for /r "src" %%f in (Newtonsoft.Json.dll) do (
+    if exist "%%f" (
+        copy "%%f" "output\scripts\ProjectLiberty\Core\" >nul
+        goto :found_core
+    )
+)
+:found_core
 
 if exist "src\LibertyScript\bin\Release\net48\LibertyScript.dll" (
     copy "src\LibertyScript\bin\Release\net48\LibertyScript.dll" "output\scripts\" >nul
 )
 
-if exist "Plugins\ExamplePlugin\bin\Release\net48\ExamplePlugin.dll" (
-    copy "Plugins\ExamplePlugin\bin\Release\net48\ExamplePlugin.dll" "output\scripts\" >nul
+echo Copying plugins...
+if exist "Plugins\TestPlugin\bin\Release\net48\TestPlugin.dll" (
+    mkdir "output\scripts\ProjectLiberty\Plugins\TestPlugin"
+    copy "Plugins\TestPlugin\bin\Release\net48\TestPlugin.dll" "output\scripts\ProjectLiberty\Plugins\TestPlugin\" >nul
 )
 
-echo Copying Newtonsoft.Json.dll to scripts...
-for /r "src" %%f in (Newtonsoft.Json.dll) do (
-    if exist "%%f" (
-        copy "%%f" "output\scripts\" >nul
-        goto :found_scripts
-    )
-)
-:found_scripts
+echo Copying configuration files...
+copy "Config\core.json" "output\scripts\ProjectLiberty\Config\" >nul
 
-mkdir "output\scripts\Config"
-copy "Config\core.json" "output\scripts\Config\" >nul
-
-mkdir "output\scripts\Languages"
-mkdir "output\scripts\Languages\en"
-mkdir "output\scripts\Languages\ru"
-copy "Languages\en\core.json" "output\scripts\Languages\en\" >nul
-copy "Languages\ru\core.json" "output\scripts\Languages\ru\" >nul
+mkdir "output\scripts\ProjectLiberty\Languages"
+mkdir "output\scripts\ProjectLiberty\Languages\en"
+mkdir "output\scripts\ProjectLiberty\Languages\ru"
+copy "Languages\en\core.json" "output\scripts\ProjectLiberty\Languages\en\" >nul
+copy "Languages\ru\core.json" "output\scripts\ProjectLiberty\Languages\ru\" >nul
 
 echo.
 echo ========================================

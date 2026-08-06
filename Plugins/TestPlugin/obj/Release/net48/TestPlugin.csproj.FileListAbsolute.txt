@@ -1,0 +1,13 @@
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\obj\Release\net48\TestPlugin.csproj.AssemblyReference.cache
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\obj\Release\net48\TestPlugin.GeneratedMSBuildEditorConfig.editorconfig
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\obj\Release\net48\TestPlugin.AssemblyInfoInputs.cache
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\obj\Release\net48\TestPlugin.AssemblyInfo.cs
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\obj\Release\net48\TestPlugin.csproj.CoreCompileInputs.cache
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\obj\Release\net48\TestPlugin.sourcelink.json
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\bin\Release\net48\TestPlugin.dll
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\bin\Release\net48\TestPlugin.pdb
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\bin\Release\net48\ProjectLiberty.Abstractions.dll
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\bin\Release\net48\ProjectLiberty.Abstractions.pdb
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\obj\Release\net48\TestPlugin.csproj.Up2Date
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\obj\Release\net48\TestPlugin.dll
+G:\ProjectLiberty\LibertyProject\Plugins\TestPlugin\obj\Release\net48\TestPlugin.pdb

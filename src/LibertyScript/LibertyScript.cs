@@ -29,8 +29,8 @@ public class LibertyScript : Script
     {
         try
         {
-            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            
+            var baseDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ProjectLiberty");
+
             // Initialize bootstrap
             _bootstrap = new ServiceBootstrap(baseDirectory);
             
