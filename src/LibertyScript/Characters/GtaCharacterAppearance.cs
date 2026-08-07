@@ -16,11 +16,9 @@ internal static class GtaCharacterAppearance
         if (Game.Player.Character.Model.Hash != model.Hash && (!model.Request(3000) || !Game.Player.ChangeModel(model))) return false;
 
         var ped = Game.Player.Character;
+        if (ped.Model.Hash != model.Hash) return false;
         Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, ped.Handle);
-        Function.Call(Hash.SET_PED_HEAD_BLEND_DATA, ped.Handle,
-            profile.FatherId, profile.MotherId, 0,
-            profile.FatherId, profile.MotherId, 0,
-            profile.ShapeMix, profile.SkinMix, 0f, false);
+        ApplyHeadBlend(ped, profile);
 
         for (var i = 0; i < profile.FaceFeatures.Length; i++)
             Function.Call((Hash)SetPedFaceFeature, ped.Handle, i, profile.FaceFeatures[i]);
@@ -68,6 +66,21 @@ internal static class GtaCharacterAppearance
         return true;
     }
 
+    public static void ApplyContinuous(CharacterProfile profile, int appearanceIndex)
+    {
+        var ped = Game.Player.Character;
+        var expectedModel = new Model(profile.Gender == CharacterGender.Male ? "mp_m_freemode_01" : "mp_f_freemode_01");
+        if (ped.Model.Hash != expectedModel.Hash)
+        {
+            Apply(profile);
+            return;
+        }
+
+        if (appearanceIndex is 3 or 4) ApplyHeadBlend(ped, profile);
+        else if (appearanceIndex >= 8 && appearanceIndex < 28)
+            Function.Call((Hash)SetPedFaceFeature, ped.Handle, appearanceIndex - 8, profile.FaceFeatures[appearanceIndex - 8]);
+    }
+
     public static int DrawableCount(Ped ped, int componentId) =>
         Math.Max(1, Function.Call<int>(Hash.GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS, ped.Handle, componentId));
 
@@ -76,6 +89,12 @@ internal static class GtaCharacterAppearance
 
     public static int PropDrawableCount(Ped ped, int propId) =>
         Math.Max(0, Function.Call<int>(Hash.GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS, ped.Handle, propId));
+
+    private static void ApplyHeadBlend(Ped ped, CharacterProfile profile) =>
+        Function.Call(Hash.SET_PED_HEAD_BLEND_DATA, ped.Handle,
+            profile.FatherId, profile.MotherId, 0,
+            profile.FatherId, profile.MotherId, 0,
+            profile.ShapeMix, profile.SkinMix, 0f, false);
 
     private static int SafeDrawable(Ped ped, int componentId, int drawable) =>
         Math.Min(Math.Max(0, drawable), DrawableCount(ped, componentId) - 1);

@@ -21,6 +21,23 @@ public sealed class LocalizationServiceTests : IDisposable
         Assert.Equal("fallback", service.GetString("core.onlyEnglish"));
     }
 
+    [Fact]
+    public void GetStrings_ReturnsLocalizedUiSnapshotWithEnglishFallback()
+    {
+        Directory.CreateDirectory(Path.Combine(_directory, "en"));
+        Directory.CreateDirectory(Path.Combine(_directory, "ru"));
+        File.WriteAllText(Path.Combine(_directory, "en", "ui.json"), "{\"title\":\"Home\",\"fallback\":\"Fallback\"}");
+        File.WriteAllText(Path.Combine(_directory, "ru", "ui.json"), "{\"title\":\"Главная\"}");
+        using var service = new LocalizationService(new TestLogger(), _directory);
+        service.LoadTranslations();
+        service.SetLanguage("ru");
+
+        var strings = service.GetStrings("ui.");
+
+        Assert.Equal("Главная", strings["ui.title"]);
+        Assert.Equal("Fallback", strings["ui.fallback"]);
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_directory)) Directory.Delete(_directory, true);

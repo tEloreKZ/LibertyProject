@@ -102,10 +102,11 @@ add_custom_command(TARGET ProjectLibertyCore POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:ProjectLibertyCore>" "${PL_NATIVE_OUT}/ProjectLiberty.Core.asi"
 )
 add_custom_command(TARGET ProjectLibertyCefSubprocess POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E remove_directory "${PL_NATIVE_OUT}/ProjectLiberty/Native"
-  COMMAND ${CMAKE_COMMAND} -E make_directory "${PL_NATIVE_OUT}/ProjectLiberty/Native"
-  COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:ProjectLibertyCefSubprocess>" "${PL_NATIVE_OUT}/ProjectLiberty/Native/ProjectLiberty.CefSubprocess.dll"
-  COMMAND ${CMAKE_COMMAND} -E copy "${CEF_ROOT}/Release/bootstrap.exe" "${PL_NATIVE_OUT}/ProjectLiberty/Native/ProjectLiberty.CefSubprocess.exe"
+  COMMAND ${CMAKE_COMMAND} -E remove_directory "${PL_NATIVE_OUT}/ProjectLiberty"
+  COMMAND ${CMAKE_COMMAND} -E remove_directory "${PL_NATIVE_OUT}/scripts/ProjectLiberty/Native"
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${PL_NATIVE_OUT}/scripts/ProjectLiberty/Native"
+  COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:ProjectLibertyCefSubprocess>" "${PL_NATIVE_OUT}/scripts/ProjectLiberty/Native/ProjectLiberty.CefSubprocess.dll"
+  COMMAND ${CMAKE_COMMAND} -E copy "${CEF_ROOT}/Release/bootstrap.exe" "${PL_NATIVE_OUT}/scripts/ProjectLiberty/Native/ProjectLiberty.CefSubprocess.exe"
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${CEF_ROOT}/Release/libcef.dll"
     "${CEF_ROOT}/Release/chrome_elf.dll"
@@ -118,8 +119,8 @@ add_custom_command(TARGET ProjectLibertyCefSubprocess POST_BUILD
     "${CEF_ROOT}/Release/vk_swiftshader.dll"
     "${CEF_ROOT}/Release/vk_swiftshader_icd.json"
     "${CEF_ROOT}/Release/vulkan-1.dll"
-    "${PL_NATIVE_OUT}/ProjectLiberty/Native"
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${CEF_ROOT}/Resources" "${PL_NATIVE_OUT}/ProjectLiberty/Native"
+    "${PL_NATIVE_OUT}/scripts/ProjectLiberty/Native"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory "${CEF_ROOT}/Resources" "${PL_NATIVE_OUT}/scripts/ProjectLiberty/Native"
 )
 
 add_dependencies(ProjectLibertyCore ProjectLibertyCefSubprocess)

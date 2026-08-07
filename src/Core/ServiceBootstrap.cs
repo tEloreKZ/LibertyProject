@@ -53,6 +53,7 @@ public class ServiceBootstrap
         localization.LoadTranslations();
         localization.SetLanguage(configuration.GetValue("localization.defaultLanguage", "en"));
         container.RegisterSingleton<ILocalization>(localization);
+        container.RegisterSingleton<ILocalizationCatalog>(localization);
 
         // Register event bus
         var eventBus = new ProjectLiberty.EventBus.EventBus(logger);

@@ -104,6 +104,14 @@ LRESULT InputManager::Handle(HWND, const UINT message, const WPARAM wparam,
   const int x = GET_X_LPARAM(lparam) - options.x;
   const int y = GET_Y_LPARAM(lparam) - options.y;
   switch (message) {
+    case WM_KILLFOCUS:
+      PostMouseMove(browser, x, y, true);
+      BrowserManager::Instance().Focus(browser->id(), false);
+      return 0;
+    case WM_CANCELMODE:
+    case WM_CAPTURECHANGED:
+      PostMouseMove(browser, x, y, true);
+      return 0;
     case WM_MOUSEMOVE:
       PostMouseMove(browser, x, y, false); handled = true; return 0;
     case WM_MOUSELEAVE:

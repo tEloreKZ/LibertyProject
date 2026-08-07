@@ -20,11 +20,14 @@ public sealed class BrowserOptions
 
     internal void Validate()
     {
-        if (Width <= 0) throw new ArgumentOutOfRangeException(nameof(Width));
-        if (Height <= 0) throw new ArgumentOutOfRangeException(nameof(Height));
+        if (Width <= 0 || Width > 8192) throw new ArgumentOutOfRangeException(nameof(Width));
+        if (Height <= 0 || Height > 8192) throw new ArgumentOutOfRangeException(nameof(Height));
+        if ((long)Width * Height > 16 * 1024 * 1024)
+            throw new ArgumentException("Browser surface cannot exceed 16 megapixels.");
         if (Fps < 1 || Fps > 120) throw new ArgumentOutOfRangeException(nameof(Fps));
         if (OwnerId != null && string.IsNullOrWhiteSpace(OwnerId))
             throw new ArgumentException("OwnerId cannot be empty.", nameof(OwnerId));
+        if (OwnerId?.Length > 128)
+            throw new ArgumentException("OwnerId cannot exceed 128 characters.", nameof(OwnerId));
     }
 }
-

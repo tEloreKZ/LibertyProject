@@ -37,7 +37,13 @@ class BrowserManager final {
   void OnRendererEvent(std::uint64_t id, std::string name, std::string json);
 
  private:
+  static constexpr std::size_t kMaximumBrowsers = 16;
+  static constexpr std::size_t kMaximumBrowsersPerOwner = 4;
+  static constexpr std::size_t kMaximumEventBytes = 1024 * 1024;
+  static constexpr int kMaximumDimension = 8192;
+  static constexpr std::int64_t kMaximumPixels = 16 * 1024 * 1024;
   static bool IsAllowedUrl(const std::string& url);
+  static bool IsAllowedBounds(int width, int height);
 
   mutable std::mutex mutex_;
   std::unordered_map<std::uint64_t, std::shared_ptr<Browser>> browsers_;
@@ -46,4 +52,3 @@ class BrowserManager final {
 };
 
 }  // namespace liberty
-

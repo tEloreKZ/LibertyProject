@@ -58,4 +58,48 @@ public sealed class CharacterRepositoryTests
             if (Directory.Exists(directory)) Directory.Delete(directory, true);
         }
     }
+
+    [Fact]
+    public void Delete_RemovesCharacterPersistsAndSelectsFirstRemainingSlot()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "ProjectLibertyTests", Guid.NewGuid().ToString("N"));
+        try
+        {
+            var path = Path.Combine(directory, "characters.json");
+            var repository = new CharacterRepository(path);
+            repository.Save(CharacterProfile.CreateDefault(3), false);
+            repository.Save(CharacterProfile.CreateDefault(2));
+
+            Assert.True(repository.Delete(2));
+            Assert.False(repository.Delete(2));
+
+            var reloaded = new CharacterRepository(path);
+            Assert.Null(reloaded.Get(2));
+            Assert.Equal(3, reloaded.ActiveSlot);
+            Assert.Equal(1, reloaded.Count);
+        }
+        finally
+        {
+            if (Directory.Exists(directory)) Directory.Delete(directory, true);
+        }
+    }
+
+    [Fact]
+    public void Delete_LastCharacterClearsActiveSlot()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "ProjectLibertyTests", Guid.NewGuid().ToString("N"));
+        try
+        {
+            var repository = new CharacterRepository(Path.Combine(directory, "characters.json"));
+            repository.Save(CharacterProfile.CreateDefault(1));
+
+            Assert.True(repository.Delete(1));
+            Assert.Null(repository.ActiveSlot);
+            Assert.Equal(1, repository.FirstFreeSlot());
+        }
+        finally
+        {
+            if (Directory.Exists(directory)) Directory.Delete(directory, true);
+        }
+    }
 }

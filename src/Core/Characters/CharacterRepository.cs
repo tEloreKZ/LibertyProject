@@ -82,6 +82,22 @@ public sealed class CharacterRepository
         }
     }
 
+    public bool Delete(int slot)
+    {
+        CharacterProfileRules.ValidateSlot(slot);
+        lock (_sync)
+        {
+            var removed = _data.Characters.RemoveAll(x => x.Slot == slot) > 0;
+            if (!removed) return false;
+
+            if (_data.ActiveSlot == slot)
+                _data.ActiveSlot = _data.Characters.OrderBy(x => x.Slot).Select(x => (int?)x.Slot).FirstOrDefault();
+
+            Persist();
+            return true;
+        }
+    }
+
     private CharacterSaveData LoadFromDisk()
     {
         if (!File.Exists(_savePath)) return new CharacterSaveData();

@@ -3,6 +3,7 @@ using GTA;
 using GTA.Math;
 using GTA.Native;
 using GTA.UI;
+using ProjectLiberty.Abstractions.Localization;
 using ProjectLiberty.Abstractions.UI;
 using ProjectLiberty.Core.Characters;
 using Font = GTA.UI.Font;
@@ -28,6 +29,27 @@ internal sealed class CharacterEditorMenu : IMenu
         "Дефекты кожи", "Борода", "Брови", "Старение", "Макияж", "Румянец", "Цвет лица",
         "Повреждения солнцем", "Помада", "Веснушки", "Волосы на груди", "Дефекты тела", "Доп. дефекты тела"
     };
+    private static readonly string[] AppearanceKeys =
+    {
+        "ui.editor.appearance.gender", "ui.editor.appearance.father", "ui.editor.appearance.mother", "ui.editor.appearance.resemblance",
+        "ui.editor.appearance.skinMix", "ui.editor.appearance.eyeColor", "ui.editor.appearance.hair", "ui.editor.appearance.hairColor",
+        "ui.editor.appearance.noseWidth", "ui.editor.appearance.noseHeight", "ui.editor.appearance.noseLength", "ui.editor.appearance.noseBridge",
+        "ui.editor.appearance.noseTip", "ui.editor.appearance.noseCurve", "ui.editor.appearance.browHeight", "ui.editor.appearance.browDepth",
+        "ui.editor.appearance.cheekHeight", "ui.editor.appearance.cheekWidth", "ui.editor.appearance.cheekWidthLower", "ui.editor.appearance.eyeOpening",
+        "ui.editor.appearance.lipThickness", "ui.editor.appearance.jawWidth", "ui.editor.appearance.jawShape", "ui.editor.appearance.chinHeight",
+        "ui.editor.appearance.chinLength", "ui.editor.appearance.chinWidth", "ui.editor.appearance.chinDimple", "ui.editor.appearance.neckThickness",
+        "ui.editor.appearance.blemishes", "ui.editor.appearance.beard", "ui.editor.appearance.eyebrows", "ui.editor.appearance.ageing",
+        "ui.editor.appearance.makeup", "ui.editor.appearance.blush", "ui.editor.appearance.complexion", "ui.editor.appearance.sunDamage",
+        "ui.editor.appearance.lipstick", "ui.editor.appearance.freckles", "ui.editor.appearance.chestHair", "ui.editor.appearance.bodyBlemishes",
+        "ui.editor.appearance.extraBodyBlemishes"
+    };
+    private static readonly string[] ClothingKeys =
+    {
+        "ui.editor.clothes.mask", "ui.editor.clothes.torso", "ui.editor.clothes.legs", "ui.editor.clothes.bags",
+        "ui.editor.clothes.shoes", "ui.editor.clothes.accessories", "ui.editor.clothes.undershirt", "ui.editor.clothes.armor",
+        "ui.editor.clothes.decals", "ui.editor.clothes.tops", "ui.editor.clothes.hat", "ui.editor.clothes.glasses",
+        "ui.editor.clothes.ear", "ui.editor.clothes.watch", "ui.editor.clothes.bracelet"
+    };
     private static readonly (string Name, int Id, bool Prop)[] ClothingItems =
     {
         ("Маска", 1, false), ("Торс", 3, false), ("Ноги", 4, false), ("Сумки", 5, false),
@@ -38,7 +60,9 @@ internal sealed class CharacterEditorMenu : IMenu
 
     private readonly string _assetsDirectory;
     private readonly CharacterRepository _repository;
+    private readonly ILocalization _localization;
     private readonly Action _returnToDashboard;
+    private readonly Action<int> _capturePortrait;
     private readonly List<IMenuItem> _items = new List<IMenuItem>();
     private CharacterProfile? _profile;
     private CustomSprite? _shell;
@@ -69,18 +93,21 @@ internal sealed class CharacterEditorMenu : IMenu
     public int Section => _section;
     public int Slot => _profile?.Slot ?? 0;
     public string FullName => _profile?.FullName ?? string.Empty;
-    public string GenderName => _profile?.Gender == CharacterGender.Female ? "Женский персонаж" : "Мужской персонаж";
-    public string SectionTitle => new[] { "ВНЕШНОСТЬ", "ОДЕЖДА", "ИМЯ И ДАННЫЕ", "ПРОСМОТР" }[_section];
+    public string GenderName => T(_profile?.Gender == CharacterGender.Female ? "ui.editor.gender.female" : "ui.editor.gender.male");
+    public string SectionTitle => T(new[] { "ui.editor.step.appearance", "ui.editor.step.clothes", "ui.editor.step.identity", "ui.editor.step.preview" }[_section]);
     public bool CanScrollUp => _rowOffset > 0;
     public bool CanScrollDown => _rowOffset + 8 < CurrentRowCount;
 
     private int CurrentRowCount => _section == 0 ? AppearanceNames.Length : _section == 1 ? ClothingItems.Length : _section == 2 ? 2 : 0;
 
-    public CharacterEditorMenu(string assetsDirectory, CharacterRepository repository, Action returnToDashboard)
+    public CharacterEditorMenu(string assetsDirectory, CharacterRepository repository, ILocalization localization,
+        Action returnToDashboard, Action<int> capturePortrait)
     {
         _assetsDirectory = assetsDirectory;
         _repository = repository;
+        _localization = localization;
         _returnToDashboard = returnToDashboard;
+        _capturePortrait = capturePortrait;
     }
 
     public void Begin(int slot)
@@ -176,6 +203,17 @@ internal sealed class CharacterEditorMenu : IMenu
         else if (_section == 1 && index >= 0 && index < ClothingItems.Length) ChangeClothing(index, Math.Sign(delta), texture);
     }
 
+    public void SetAppearanceValue(int index, float value)
+    {
+        if (_profile == null || _section != 0) return;
+        if (index == 3) _profile.ShapeMix = Clamp(value, 0f, 1f);
+        else if (index == 4) _profile.SkinMix = Clamp(value, 0f, 1f);
+        else if (index >= 8 && index < 28) _profile.FaceFeatures[index - 8] = Clamp(value, -1f, 1f);
+        else return;
+
+        GtaCharacterAppearance.ApplyContinuous(_profile, index);
+    }
+
     public void NextSection()
     {
         if (_section < 3)
@@ -211,23 +249,31 @@ internal sealed class CharacterEditorMenu : IMenu
             var index = _rowOffset + visible;
             if (index >= CurrentRowCount) break;
             if (_section == 0)
-                rows.Add(new CharacterEditorRow(index, AppearanceNames[index], AppearanceValue(index)));
+            {
+                var slider = index is 3 or 4 || index >= 8 && index < 28;
+                rows.Add(new CharacterEditorRow(index, T(AppearanceKeys[index]), AppearanceValue(index),
+                    kind: slider ? "slider" : "value",
+                    numericValue: slider ? AppearanceNumericValue(index) : null,
+                    minimum: index >= 8 ? -1f : 0f,
+                    maximum: 1f,
+                    step: .01f));
+            }
             else if (_section == 1)
             {
                 var item = ClothingItems[index];
                 if (item.Prop)
                 {
                     var prop = _profile.Props[item.Id];
-                    rows.Add(new CharacterEditorRow(index, item.Name, prop.Drawable < 0 ? "Нет" : prop.Drawable.ToString(), prop.Texture.ToString()));
+                    rows.Add(new CharacterEditorRow(index, T(ClothingKeys[index]), prop.Drawable < 0 ? T("ui.editor.value.none") : prop.Drawable.ToString(), prop.Texture.ToString()));
                 }
                 else
                 {
                     var component = _profile.Components[item.Id];
-                    rows.Add(new CharacterEditorRow(index, item.Name, component.Drawable.ToString(), component.Texture.ToString()));
+                    rows.Add(new CharacterEditorRow(index, T(ClothingKeys[index]), component.Drawable.ToString(), component.Texture.ToString()));
                 }
             }
             else if (_section == 2)
-                rows.Add(new CharacterEditorRow(index, index == 0 ? "Имя" : "Фамилия", index == 0 ? _profile.FirstName : _profile.LastName, kind: "text"));
+                rows.Add(new CharacterEditorRow(index, T(index == 0 ? "ui.editor.identity.firstName" : "ui.editor.identity.lastName"), index == 0 ? _profile.FirstName : _profile.LastName, kind: "text"));
         }
         return rows;
     }
@@ -310,11 +356,17 @@ internal sealed class CharacterEditorMenu : IMenu
             var defaults = CharacterProfile.CreateDefault(_profile.Slot);
             _profile.Components = defaults.Components;
             _profile.Props = defaults.Props;
+            _profile.Overlays = defaults.Overlays;
+            _profile.FaceFeatures = defaults.FaceFeatures;
+            _profile.FatherId = 0;
+            _profile.MotherId = 21;
+            _profile.ShapeMix = _profile.Gender == CharacterGender.Female ? .85f : .15f;
+            _profile.SkinMix = .5f;
             _profile.HairDrawable = 0;
             _profile.HairTexture = 0;
         }
-        else if (index == 1) _profile.FatherId = Wrap(_profile.FatherId + delta, 46);
-        else if (index == 2) _profile.MotherId = Wrap(_profile.MotherId + delta, 46);
+        else if (index == 1) _profile.FatherId = Wrap(_profile.FatherId + delta, 24);
+        else if (index == 2) _profile.MotherId = 21 + Wrap(_profile.MotherId - 21 + delta, 25);
         else if (index == 3) _profile.ShapeMix = Clamp(_profile.ShapeMix + delta * .05f, 0f, 1f);
         else if (index == 4) _profile.SkinMix = Clamp(_profile.SkinMix + delta * .05f, 0f, 1f);
         else if (index == 5) _profile.EyeColor = Wrap(_profile.EyeColor + delta, 32);
@@ -383,6 +435,7 @@ internal sealed class CharacterEditorMenu : IMenu
         if (_profile == null) return;
         CharacterProfileRules.Normalize(_profile);
         _repository.Save(_profile);
+        _capturePortrait(_profile.Slot);
         CloseEditor(true);
         Notification.Show($"~p~Project Liberty~w~: {_profile.FullName} сохранен");
     }
@@ -521,7 +574,7 @@ internal sealed class CharacterEditorMenu : IMenu
     private string AppearanceValue(int index)
     {
         if (_profile == null) return string.Empty;
-        if (index == 0) return _profile.Gender == CharacterGender.Male ? "Мужской" : "Женский";
+        if (index == 0) return T(_profile.Gender == CharacterGender.Male ? "ui.editor.gender.male" : "ui.editor.gender.female");
         if (index == 1) return _profile.FatherId.ToString();
         if (index == 2) return _profile.MotherId.ToString();
         if (index == 3) return $"{_profile.ShapeMix:P0}";
@@ -530,7 +583,15 @@ internal sealed class CharacterEditorMenu : IMenu
         if (index == 6) return _profile.HairDrawable.ToString();
         if (index == 7) return _profile.HairColor.ToString();
         if (index < 28) return $"{_profile.FaceFeatures[index - 8]:0.0}";
-        return _profile.Overlays[index - 28].Value < 0 ? "Нет" : _profile.Overlays[index - 28].Value.ToString();
+        return _profile.Overlays[index - 28].Value < 0 ? T("ui.editor.value.none") : _profile.Overlays[index - 28].Value.ToString();
+    }
+
+    private float AppearanceNumericValue(int index)
+    {
+        if (_profile == null) return 0f;
+        if (index == 3) return _profile.ShapeMix;
+        if (index == 4) return _profile.SkinMix;
+        return index >= 8 && index < 28 ? _profile.FaceFeatures[index - 8] : 0f;
     }
 
     private string ClothingValue(int index)
@@ -624,6 +685,7 @@ internal sealed class CharacterEditorMenu : IMenu
 
     private static int Wrap(int value, int count) => count <= 0 ? 0 : ((value % count) + count) % count;
     private static float Clamp(float value, float min, float max) => value < min ? min : value > max ? max : value;
+    private string T(string key) => _localization.GetString(key);
 }
 
 internal sealed class CharacterEditorRow
@@ -633,13 +695,22 @@ internal sealed class CharacterEditorRow
     public string Value { get; }
     public string? SecondaryValue { get; }
     public string Kind { get; }
+    public float? NumericValue { get; }
+    public float Minimum { get; }
+    public float Maximum { get; }
+    public float Step { get; }
 
-    public CharacterEditorRow(int index, string label, string value, string? secondaryValue = null, string kind = "value")
+    public CharacterEditorRow(int index, string label, string value, string? secondaryValue = null, string kind = "value",
+        float? numericValue = null, float minimum = 0f, float maximum = 1f, float step = .01f)
     {
         Index = index;
         Label = label;
         Value = value;
         SecondaryValue = secondaryValue;
         Kind = kind;
+        NumericValue = numericValue;
+        Minimum = minimum;
+        Maximum = maximum;
+        Step = step;
     }
 }

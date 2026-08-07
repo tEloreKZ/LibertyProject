@@ -16,8 +16,8 @@ public static class CharacterProfileRules
         ValidateSlot(profile.Slot);
         profile.FirstName = NormalizeName(profile.FirstName, "Новый");
         profile.LastName = NormalizeName(profile.LastName, "Персонаж");
-        profile.FatherId = Clamp(profile.FatherId, 0, 45);
-        profile.MotherId = Clamp(profile.MotherId, 0, 45);
+        profile.FatherId = Clamp(profile.FatherId, 0, 23);
+        profile.MotherId = Clamp(profile.MotherId, 21, 45);
         profile.ShapeMix = Clamp(profile.ShapeMix, 0f, 1f);
         profile.SkinMix = Clamp(profile.SkinMix, 0f, 1f);
         profile.EyeColor = Clamp(profile.EyeColor, 0, 31);

@@ -154,3 +154,33 @@ New-Item -ItemType SymbolicLink -Path "GTA V\scripts\Plugins" -Target "G:\Projec
 ```
 
 This allows you to modify files in the project directory and have them immediately available in-game.
+# GTA V Enhanced installation
+
+Build the complete package and install it with the repository installer:
+
+```powershell
+cmd /c build.bat
+powershell -ExecutionPolicy Bypass -File Build\Install-Gta.ps1 `
+  -GtaPath "D:\SteamLibrary\steamapps\common\Grand Theft Auto V Enhanced"
+```
+
+The installed layout is intentionally consolidated:
+
+```text
+Grand Theft Auto V Enhanced/
+├── ProjectLiberty.Core.asi
+└── scripts/
+    ├── LibertyScript.dll
+    └── ProjectLiberty/
+        ├── Core/
+        ├── Native/
+        ├── UI/
+        ├── Config/
+        ├── Languages/
+        ├── Plugins/
+        ├── Saves/
+        └── Logs/
+```
+
+The installer migrates `Saves`, `Logs`, and `Cache` from the obsolete root
+`ProjectLiberty` directory before removing that duplicate directory.

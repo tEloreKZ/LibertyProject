@@ -4,6 +4,7 @@ using GTA.UI;
 using ProjectLiberty.Core;
 using ProjectLiberty.Core.Characters;
 using ProjectLiberty.Core.DependencyInjection;
+using ProjectLiberty.Abstractions.Localization;
 using ProjectLiberty.Abstractions.Logging;
 using ProjectLiberty.LibertyScript.Characters;
 using ProjectLiberty.LibertyScript.UI;
@@ -20,6 +21,8 @@ public class LibertyScript : Script
     private Application? _application;
     private ServiceContainer? _container;
     private ILogger? _logger;
+    private ILocalization? _localization;
+    private ILocalizationCatalog? _localizationCatalog;
     private CharacterRepository? _characters;
     private CharacterEditorMenu? _characterEditor;
     private CefUiBridge? _cefUi;
@@ -33,6 +36,8 @@ public class LibertyScript : Script
     private bool _initializationAttempted;
     private bool _firstTickCompleted;
     private int _suppressPauseUntil;
+    private string _baseDirectory = string.Empty;
+    private readonly Dictionary<int, (DateTime UpdatedUtc, string DataUri)> _portraitCache = new();
 
     public LibertyScript()
     {
@@ -46,6 +51,7 @@ public class LibertyScript : Script
         try
         {
             var baseDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ProjectLiberty");
+            _baseDirectory = baseDirectory;
 
             // Initialize bootstrap
             _bootstrap = new ServiceBootstrap(baseDirectory);
@@ -53,6 +59,8 @@ public class LibertyScript : Script
             // Configure services
             _container = _bootstrap.ConfigureServices();
             _logger = _container.GetService<ILogger>();
+            _localization = _container.GetService<ILocalization>();
+            _localizationCatalog = _container.GetService<ILocalizationCatalog>();
 
             // Get application
             _application = _container.GetService<Application>();
@@ -91,7 +99,9 @@ public class LibertyScript : Script
     {
         var assetsDirectory = Path.Combine(baseDirectory, "Assets", "UI");
         _characters = new CharacterRepository(Path.Combine(baseDirectory, "Saves", "characters.json"));
-        _characterEditor = new CharacterEditorMenu(assetsDirectory, _characters, () => _uiView = "dashboard");
+        _characterEditor = new CharacterEditorMenu(assetsDirectory, _characters,
+            _localization ?? throw new InvalidOperationException("Localization service is unavailable"),
+            () => _uiView = "dashboard", CaptureCharacterPortrait);
         _cefUi = new CefUiBridge();
         _pendingActiveCharacterApply = _characters.ActiveSlot.HasValue;
     }
@@ -106,7 +116,7 @@ public class LibertyScript : Script
         }
         if (_characters.Count >= CharacterProfileRules.MaximumCharacters)
         {
-            Notification.Show("~p~Project Liberty~w~: доступно только 3 персонажа");
+            Notification.Show($"~p~Project Liberty~w~: {T("ui.notification.maxCharacters")}");
             return;
         }
         _characterEditor.Begin(slot);
@@ -118,14 +128,44 @@ public class LibertyScript : Script
         if (_characters == null) return;
         var profile = _characters.Get(slot);
         if (profile == null) { BeginCharacterCreation(slot); return; }
+        EnsureCharacterPortrait(slot);
         if (!GtaCharacterAppearance.Apply(profile))
         {
-            Notification.Show("~r~Не удалось загрузить персонажа");
+            Notification.Show($"~r~{T("ui.notification.characterLoadFailed")}");
             return;
         }
         _characters.SetActive(slot);
         _uiView = "hidden";
-        Notification.Show($"~p~Project Liberty~w~: выбран {profile.FullName}");
+        Notification.Show($"~p~Project Liberty~w~: {T("ui.notification.characterSelected")} {profile.FullName}");
+    }
+
+    private void DeleteCharacter(int slot)
+    {
+        if (_characters == null) return;
+        if (slot < 1 || slot > CharacterProfileRules.MaximumCharacters) return;
+        var profile = _characters.Get(slot);
+        if (profile == null || !_characters.Delete(slot)) return;
+
+        var portrait = PortraitPath(slot);
+        try
+        {
+            if (File.Exists(portrait)) File.Delete(portrait);
+        }
+        catch (Exception exception)
+        {
+            _logger?.LogWarning($"Character slot {slot} was deleted, but its portrait could not be removed: {exception.Message}");
+        }
+        _portraitCache.Remove(slot);
+
+        if (_characters.ActiveSlot is int activeSlot)
+        {
+            var active = _characters.Get(activeSlot);
+            if (active != null) GtaCharacterAppearance.Apply(active);
+        }
+
+        _logger?.LogInformation($"Deleted character {profile.FullName} from slot {slot}");
+        Notification.Show($"~p~Project Liberty~w~: {T("ui.notification.characterDeleted")}");
+        _lastSentUiView = string.Empty;
     }
 
     private void OnTick(object sender, EventArgs e)
@@ -206,6 +246,7 @@ public class LibertyScript : Script
                 Notification.Show("~r~Project Liberty CEF UI недоступен. Выполните build.bat и установите результат целиком");
                 return;
             }
+            if (_characters?.ActiveSlot is int activeSlot) EnsureCharacterPortrait(activeSlot);
             _uiView = "dashboard";
         }
         else
@@ -227,12 +268,14 @@ public class LibertyScript : Script
         switch (action)
         {
             case "close": _uiView = "hidden"; break;
-            case "future": Notification.Show("~p~Project Liberty~w~: функция будет доступна в следующих фазах"); break;
+            case "future": Notification.Show($"~p~Project Liberty~w~: {T("ui.notification.future")}"); break;
             case "create-character": BeginCharacterCreation(slot); break;
             case "select-character": SelectCharacter(slot); break;
+            case "delete-character": DeleteCharacter(slot); break;
             case "editor-section": _characterEditor?.SetSection(message.Value<int>("section")); break;
             case "editor-scroll": _characterEditor?.ScrollRows(message.Value<int>("delta")); break;
             case "editor-adjust": _characterEditor?.Adjust(message.Value<int>("index"), message.Value<int>("delta"), message.Value<bool?>("texture") ?? false); break;
+            case "editor-set": _characterEditor?.SetAppearanceValue(message.Value<int>("index"), message.Value<float>("value")); break;
             case "editor-next": _characterEditor?.NextSection(); break;
             case "editor-save": _characterEditor?.Save(); break;
             case "editor-cancel": _characterEditor?.Cancel(); break;
@@ -284,8 +327,9 @@ public class LibertyScript : Script
         {
             slot = profile.Slot,
             fullName = profile.FullName,
-            gender = profile.Gender == CharacterGender.Female ? "Женский персонаж" : "Мужской персонаж",
-            active = _characters.ActiveSlot == profile.Slot
+            gender = T(profile.Gender == CharacterGender.Female ? "ui.editor.gender.female" : "ui.editor.gender.male"),
+            active = _characters.ActiveSlot == profile.Slot,
+            portrait = GetPortraitDataUri(profile.Slot)
         }).ToArray();
         object? editor = null;
         if (view == "editor" && _characterEditor != null)
@@ -303,15 +347,81 @@ public class LibertyScript : Script
                     label = row.Label,
                     value = row.Value,
                     secondaryValue = row.SecondaryValue,
-                    kind = row.Kind
+                    kind = row.Kind,
+                    numericValue = row.NumericValue,
+                    min = row.Minimum,
+                    max = row.Maximum,
+                    step = row.Step
                 }).ToArray(),
                 canScrollUp = _characterEditor.CanScrollUp,
                 canScrollDown = _characterEditor.CanScrollDown
             };
         }
-        var state = new { type = "state", view, characters, activeSlot = _characters.ActiveSlot, editor };
+        var state = new
+        {
+            type = "state",
+            view,
+            language = _localization?.CurrentLanguage ?? "en",
+            translations = _localizationCatalog?.GetStrings("ui.") ?? new Dictionary<string, string>(),
+            characters,
+            activeSlot = _characters.ActiveSlot,
+            editor
+        };
         _cefUi?.SendState(state, view);
     }
+
+    private string T(string key) => _localization?.GetString(key) ?? key;
+
+    private void CaptureCharacterPortrait(int slot)
+    {
+        try
+        {
+            _cefUi?.HideForCapture();
+            Script.Wait(100);
+            var path = PortraitPath(slot);
+            if (CharacterPortraitCapture.Capture(path))
+            {
+                _portraitCache.Remove(slot);
+                _logger?.LogInformation($"Captured portrait for character slot {slot}");
+            }
+            else _logger?.LogWarning($"Could not capture portrait for character slot {slot}");
+        }
+        catch (Exception exception)
+        {
+            _logger?.LogError(exception, $"Failed to capture portrait for character slot {slot}");
+        }
+    }
+
+    private void EnsureCharacterPortrait(int slot)
+    {
+        if (File.Exists(PortraitPath(slot)) || _characterEditor == null || _characterEditor.IsVisible) return;
+        _characterEditor.Begin(slot);
+        if (!_characterEditor.IsVisible) return;
+        _characterEditor.SetSection(3);
+        CaptureCharacterPortrait(slot);
+        _characterEditor.Cancel();
+    }
+
+    private string? GetPortraitDataUri(int slot)
+    {
+        var path = PortraitPath(slot);
+        if (!File.Exists(path)) return null;
+        var updated = File.GetLastWriteTimeUtc(path);
+        if (_portraitCache.TryGetValue(slot, out var cached) && cached.UpdatedUtc == updated) return cached.DataUri;
+        try
+        {
+            var uri = "data:image/jpeg;base64," + Convert.ToBase64String(File.ReadAllBytes(path));
+            _portraitCache[slot] = (updated, uri);
+            return uri;
+        }
+        catch (Exception exception)
+        {
+            _logger?.LogError(exception, $"Failed to load portrait for character slot {slot}");
+            return null;
+        }
+    }
+
+    private string PortraitPath(int slot) => Path.Combine(_baseDirectory, "Saves", "Portraits", $"character-{slot}.jpg");
 
     private void OnAborted(object sender, EventArgs e)
     {
@@ -328,11 +438,14 @@ public class LibertyScript : Script
             _container?.Dispose();
             _container = null;
             _logger = null;
+            _localization = null;
+            _localizationCatalog = null;
             _application = null;
             _characters = null;
             _characterEditor = null;
             _cefUi = null;
             _cefTest = null;
+            _portraitCache.Clear();
             _initialized = false;
         }
     }

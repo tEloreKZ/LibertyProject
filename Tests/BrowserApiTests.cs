@@ -23,6 +23,21 @@ public sealed class BrowserApiTests
     }
 
     [Fact]
+    public void CreateRejectsBrowserSurfacesAboveProductionLimit()
+    {
+        var options = new BrowserOptions { Width = 8192, Height = 8192 };
+        Assert.Throws<ArgumentException>(() =>
+            Browser.Create("liberty://ui/test/index.html", options));
+    }
+
+    [Fact]
+    public void CreateRejectsOversizedUrlsBeforeCallingNativeCore()
+    {
+        var url = "liberty://ui/" + new string('a', 2048);
+        Assert.Throws<ArgumentException>(() => Browser.Create(url));
+    }
+
+    [Fact]
     public void DispatchRejectsInvalidBatchSizeWithoutNativeCore()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => Browser.DispatchPendingEvents(0));

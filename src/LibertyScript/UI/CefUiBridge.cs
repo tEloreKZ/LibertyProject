@@ -79,6 +79,13 @@ internal sealed class CefUiBridge : IDisposable
 
     public bool TryDequeueAction(out JObject action) => _actions.TryDequeue(out action!);
 
+    public void HideForCapture()
+    {
+        if (_browser == null || !_pageReady) return;
+        _browser.Unfocus();
+        _browser.Hide();
+    }
+
     private void CreateBrowser()
     {
         var resolution = Screen.Resolution;

@@ -6,6 +6,7 @@
 #include <d3d12.h>
 #include <dxgi.h>
 #include <MinHook.h>
+#include <atomic>
 #include <mutex>
 #include <wrl/client.h>
 
@@ -27,14 +28,38 @@ ExecuteCommandListsFunction original_execute_command_lists{};
 D3D11Backend backend;
 std::mutex command_queue_mutex;
 Microsoft::WRL::ComPtr<ID3D12CommandQueue> command_queue;
+void* execute_command_lists_target{};
+std::atomic_bool execute_hook_enabled{};
+std::atomic_bool command_queue_captured{};
 
 void __stdcall ExecuteCommandListsHook(ID3D12CommandQueue* queue, const UINT count,
                                        ID3D12CommandList* const* lists) {
-  if (queue && queue->GetDesc().Type == D3D12_COMMAND_LIST_TYPE_DIRECT) {
-    std::scoped_lock lock(command_queue_mutex);
-    if (command_queue.Get() != queue) command_queue = queue;
-  }
+  // Never delay GTA's submission path. Capture the queue only after forwarding
+  // the command lists and make every subsequent invocation an atomic fast path.
   original_execute_command_lists(queue, count, lists);
+  if (!command_queue_captured.load(std::memory_order_acquire) && queue &&
+      queue->GetDesc().Type == D3D12_COMMAND_LIST_TYPE_DIRECT) {
+    std::scoped_lock lock(command_queue_mutex);
+    if (!command_queue) {
+      command_queue = queue;
+      command_queue_captured.store(true, std::memory_order_release);
+    }
+  }
+}
+
+bool EnableD3D12QueueHookOnDemand() {
+  if (!execute_command_lists_target) return false;
+  bool expected = false;
+  if (!execute_hook_enabled.compare_exchange_strong(expected, true,
+          std::memory_order_acq_rel)) return true;
+  if (MH_EnableHook(execute_command_lists_target) != MH_OK) {
+    execute_hook_enabled.store(false, std::memory_order_release);
+    NativeLogger::Instance().Error("[CEF] Failed to enable D3D12 queue hook on demand");
+    return false;
+  }
+  execute_hook_enabled.store(true, std::memory_order_release);
+  NativeLogger::Instance().Info("[CEF] D3D12 queue hook enabled on demand");
+  return true;
 }
 
 Microsoft::WRL::ComPtr<ID3D12CommandQueue> CurrentCommandQueue() {
@@ -53,7 +78,10 @@ HRESULT __stdcall PresentHook(IDXGISwapChain* swap_chain, const UINT sync_interv
 
   const auto d3d11_ready = backend.Initialize(swap_chain);
   Microsoft::WRL::ComPtr<ID3D12CommandQueue> queue;
-  if (!d3d11_ready) queue = CurrentCommandQueue();
+  if (!d3d11_ready) {
+    EnableD3D12QueueHookOnDemand();
+    queue = CurrentCommandQueue();
+  }
   if (d3d11_ready || backend.InitializeOn12(swap_chain, queue.Get())) {
     DXGI_SWAP_CHAIN_DESC description{};
     if (SUCCEEDED(swap_chain->GetDesc(&description)))
@@ -120,18 +148,34 @@ bool DxgiHook::Initialize() {
   }
 
   const auto initialize_result = MH_Initialize();
-  bool success = (initialize_result == MH_OK || initialize_result == MH_ERROR_ALREADY_INITIALIZED) &&
-      MH_CreateHook(table[8], &PresentHook, reinterpret_cast<void**>(&original_present)) == MH_OK &&
-      MH_CreateHook(table[13], &ResizeHook, reinterpret_cast<void**>(&original_resize)) == MH_OK &&
-      (!execute_address || MH_CreateHook(execute_address, &ExecuteCommandListsHook,
-          reinterpret_cast<void**>(&original_execute_command_lists)) == MH_OK) &&
-      MH_EnableHook(MH_ALL_HOOKS) == MH_OK;
+  const bool minhook_ready = initialize_result == MH_OK ||
+                             initialize_result == MH_ERROR_ALREADY_INITIALIZED;
+  const bool present_created = minhook_ready &&
+      MH_CreateHook(table[8], &PresentHook, reinterpret_cast<void**>(&original_present)) == MH_OK;
+  const bool resize_created = present_created &&
+      MH_CreateHook(table[13], &ResizeHook, reinterpret_cast<void**>(&original_resize)) == MH_OK;
+  const bool execute_created = !execute_address || (resize_created &&
+      MH_CreateHook(execute_address, &ExecuteCommandListsHook,
+          reinterpret_cast<void**>(&original_execute_command_lists)) == MH_OK);
+  const bool present_enabled = execute_created && MH_EnableHook(table[8]) == MH_OK;
+  const bool resize_enabled = present_enabled && MH_EnableHook(table[13]) == MH_OK;
+  const bool success = resize_enabled;
+  if (!success) {
+    if (present_enabled) MH_DisableHook(table[8]);
+    if (present_created) MH_RemoveHook(table[8]);
+    if (resize_created) MH_RemoveHook(table[13]);
+    if (execute_address && execute_created) MH_RemoveHook(execute_address);
+    MH_Uninitialize();
+  }
+  execute_command_lists_target = success ? execute_address : nullptr;
+  execute_hook_enabled.store(false);
+  command_queue_captured.store(false);
   swap_chain.Reset(); context.Reset(); device.Reset();
   DestroyWindow(window);
   UnregisterClassW(window_class.lpszClassName, window_class.hInstance);
   initialized_.store(success);
   if (success) NativeLogger::Instance().Info(
-      execute_address ? "[CEF] DXGI Present and D3D12 queue hooks installed"
+      execute_address ? "[CEF] DXGI hooks installed; D3D12 queue hook armed on demand"
                       : "[CEF] DXGI Present hook installed (D3D11 only)");
   else NativeLogger::Instance().Error("[CEF] Failed to install DXGI Present hook");
   return success;
@@ -146,6 +190,9 @@ void DxgiHook::Shutdown() {
     std::scoped_lock lock(command_queue_mutex);
     command_queue.Reset();
   }
+  command_queue_captured.store(false);
+  execute_hook_enabled.store(false);
+  execute_command_lists_target = nullptr;
   backend.Shutdown();
 }
 

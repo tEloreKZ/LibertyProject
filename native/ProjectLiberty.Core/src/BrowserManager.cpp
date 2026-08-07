@@ -20,14 +20,20 @@ BrowserManager& BrowserManager::Instance() {
 void BrowserManager::SetReady(const bool ready) { ready_.store(ready); }
 
 std::uint64_t BrowserManager::CreateBrowser(BrowserOptions options) {
-  if (!IsReady() || !IsAllowedUrl(options.url)) return 0;
-  options.width = std::max(1, options.width);
-  options.height = std::max(1, options.height);
+  if (!IsReady() || !IsAllowedUrl(options.url) || options.owner.empty() ||
+      options.owner.size() > 128 || !IsAllowedBounds(options.width, options.height)) return 0;
   options.fps = std::clamp(options.fps, 1, 120);
-  const auto id = next_id_.fetch_add(1);
-  auto state = std::make_shared<Browser>(id, std::move(options));
+  std::shared_ptr<Browser> state;
+  std::uint64_t id{};
   {
     std::scoped_lock lock(mutex_);
+    if (browsers_.size() >= kMaximumBrowsers) return 0;
+    const auto owner_count = std::ranges::count_if(browsers_, [&](const auto& entry) {
+      return entry.second->options().owner == options.owner;
+    });
+    if (owner_count >= kMaximumBrowsersPerOwner) return 0;
+    id = next_id_.fetch_add(1);
+    state = std::make_shared<Browser>(id, std::move(options));
     browsers_.emplace(id, state);
   }
 
@@ -87,9 +93,11 @@ bool BrowserManager::Show(const std::uint64_t id, const bool visible) {
   auto browser = Find(id);
   if (!browser) return false;
   browser->SetVisible(visible);
+  if (!visible) browser->SetFocused(false);
   auto cef_browser = browser->cef_browser();
   if (cef_browser) CefPostTask(TID_UI, base::BindOnce([](CefRefPtr<CefBrowser> value, bool hidden) {
     value->GetHost()->WasHidden(hidden);
+    if (hidden) value->GetHost()->SetFocus(false);
   }, cef_browser, !visible));
   return true;
 }
@@ -128,7 +136,7 @@ bool BrowserManager::LoadUrl(const std::uint64_t id, const std::string& url) {
 bool BrowserManager::SetBounds(const std::uint64_t id, const int x, const int y,
                                const int width, const int height) {
   auto browser = Find(id);
-  if (!browser || width <= 0 || height <= 0) return false;
+  if (!browser || !IsAllowedBounds(width, height)) return false;
   browser->SetBounds(x, y, width, height);
   auto cef_browser = browser->cef_browser();
   if (cef_browser) CefPostTask(TID_UI, base::BindOnce([](CefRefPtr<CefBrowser> value) {
@@ -146,7 +154,8 @@ bool BrowserManager::SetZIndex(const std::uint64_t id, const int z_index) {
 
 bool BrowserManager::Emit(const std::uint64_t id, const std::string& event_name,
                           const std::string& json) {
-  if (event_name.empty() || !CefParseJSON(json, JSON_PARSER_RFC)) return false;
+  if (event_name.empty() || event_name.size() > 128 || json.size() > kMaximumEventBytes ||
+      !CefParseJSON(json, JSON_PARSER_RFC)) return false;
   auto browser = Find(id);
   if (!browser) return false;
   auto cef_browser = browser->cef_browser();
@@ -221,13 +230,26 @@ void BrowserManager::OnBrowserClosed(const std::uint64_t id) {
 
 void BrowserManager::OnRendererEvent(const std::uint64_t id, std::string name,
                                      std::string json) {
-  if (!Find(id) || name.empty() || name.size() > 128 || json.size() > 16 * 1024 * 1024 ||
+  if (!Find(id) || name.empty() || name.size() > 128 || json.size() > kMaximumEventBytes ||
       !CefParseJSON(json, JSON_PARSER_RFC)) return;
   EventQueue::Instance().Push({id, std::move(name), std::move(json)});
 }
 
 bool BrowserManager::IsAllowedUrl(const std::string& url) {
-  return url.starts_with("liberty://ui/") || url.starts_with("liberty://mods/");
+  if (url.empty() || url.size() > 2048 || url.find('\0') != std::string::npos) return false;
+  CefURLParts parts;
+  if (!CefParseURL(url, parts)) return false;
+  const auto scheme = CefString(&parts.scheme).ToString();
+  const auto host = CefString(&parts.host).ToString();
+  const auto path = CefString(&parts.path).ToString();
+  return scheme == "liberty" && (host == "ui" || host == "mods") &&
+         !path.empty() && path.front() == '/';
+}
+
+bool BrowserManager::IsAllowedBounds(const int width, const int height) {
+  return width > 0 && height > 0 && width <= kMaximumDimension &&
+         height <= kMaximumDimension &&
+         static_cast<std::int64_t>(width) * height <= kMaximumPixels;
 }
 
 }  // namespace liberty

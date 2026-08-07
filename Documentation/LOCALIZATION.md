@@ -21,6 +21,20 @@
 
 Project Liberty requires full multi-language support. All text must be stored outside code, allowing for easy translation and language switching without code modifications.
 
+### Current CEF integration
+
+The production React UI consumes the existing localization service; it does not maintain a separate JavaScript translation database.
+
+```text
+Languages/<code>/ui.json
+    -> LocalizationService (English fallback)
+    -> ILocalizationCatalog.GetStrings("ui.")
+    -> managed ui:state
+    -> React translator
+```
+
+`ILocalizationCatalog` is intentionally separate from `ILocalization`, preserving source compatibility for third-party implementations of the original plugin API. The shipped and fully populated UI catalogs are English and Russian. Select the active language through `localization.defaultLanguage` in `Config/core.json`.
+
 ### Planned Language Set
 
 The repository currently ships English (`en`) and Russian (`ru`) resources. The remaining entries are planned and require translation files before they are supported:

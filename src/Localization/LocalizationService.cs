@@ -5,7 +5,7 @@ using ProjectLiberty.Abstractions.Logging;
 namespace ProjectLiberty.Localization;
 
 /// <summary>Thread-safe JSON localization service with English fallback.</summary>
-public sealed class LocalizationService : ILocalization, IDisposable
+public sealed class LocalizationService : ILocalization, ILocalizationCatalog, IDisposable
 {
     private readonly Dictionary<string, Dictionary<string, string>> _translations = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
     private readonly object _sync = new object();
@@ -75,6 +75,21 @@ public sealed class LocalizationService : ILocalization, IDisposable
         lock (_sync) return _translations.Keys.OrderBy(key => key, StringComparer.OrdinalIgnoreCase).ToArray();
     }
 
+    public IReadOnlyDictionary<string, string> GetStrings(string prefix = "")
+    {
+        ThrowIfDisposed();
+        prefix ??= string.Empty;
+        lock (_sync)
+        {
+            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (_translations.TryGetValue("en", out var fallback))
+                CopyMatching(fallback, prefix, result);
+            if (_translations.TryGetValue(_currentLanguage, out var current))
+                CopyMatching(current, prefix, result);
+            return result;
+        }
+    }
+
     public void LoadTranslations()
     {
         ThrowIfDisposed();
@@ -126,6 +141,14 @@ public sealed class LocalizationService : ILocalization, IDisposable
     {
         value = string.Empty;
         return _translations.TryGetValue(language, out var values) && values.TryGetValue(key, out value!);
+    }
+
+    private static void CopyMatching(IReadOnlyDictionary<string, string> source, string prefix,
+        IDictionary<string, string> target)
+    {
+        foreach (var pair in source)
+            if (pair.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                target[pair.Key] = pair.Value;
     }
 
     public void Dispose()

@@ -22,7 +22,13 @@ CEF belongs to `ProjectLiberty.Core.asi`, not to SHVDN. Reloading managed script
 - `src/LibertyScript/LibertyScript.cs` builds UI state and applies validated actions on the GTA game thread.
 - `native/ProjectLiberty.Core/src/UI` and related CEF/graphics sources own browser lifecycle, input and rendering.
 
-`build.bat` builds the production React bundle into `src/WebUI/dist` and deploys it to `GTA V/ProjectLiberty/ui`. The native `liberty://ui/index.html` scheme serves this directory without granting arbitrary filesystem access.
+`build.bat` builds the production React bundle into `src/WebUI/dist` and deploys it to `GTA V/scripts/ProjectLiberty/UI`. The native `liberty://ui/index.html` scheme serves this directory without granting arbitrary filesystem access.
+
+## Localization contract
+
+React contains no language-specific dashboard/editor copy. Managed code reads the active language through `ILocalization`, obtains the `ui.*` snapshot through the additive `ILocalizationCatalog`, and includes both `language` and `translations` in `ui:state`. English values are merged first and act as fallback for missing strings. UI translations live in `Languages/<language>/ui.json`; changing `localization.defaultLanguage` in `Config/core.json` changes the CEF UI language after restart.
+
+Character editor row labels are localized on the game thread because they are part of the managed editor model. React-owned labels are resolved in the browser from the same state snapshot, so managed and CEF UI always use one language source.
 
 ## Message contract
 

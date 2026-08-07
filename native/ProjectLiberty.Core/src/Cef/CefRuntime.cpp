@@ -34,8 +34,21 @@ bool CefRuntime::Initialize(const std::filesystem::path& game_root) {
   if (initialized_) return true;
   auto& logger = NativeLogger::Instance();
   logger.Info("[CEF] Initializing");
-  const auto native_root = game_root / L"ProjectLiberty" / L"Native";
-  const auto content_root = game_root / L"ProjectLiberty";
+  const auto content_root = game_root / L"scripts" / L"ProjectLiberty";
+  const auto native_root = content_root / L"Native";
+  const auto cache_root = content_root / L"Cache" / L"CEF";
+  const auto logs_root = content_root / L"Logs";
+  std::error_code directory_error;
+  std::filesystem::create_directories(cache_root, directory_error);
+  if (directory_error) {
+    logger.Error("[CEF] Cannot create cache directory: " + directory_error.message());
+    return false;
+  }
+  std::filesystem::create_directories(logs_root, directory_error);
+  if (directory_error) {
+    logger.Error("[CEF] Cannot create log directory: " + directory_error.message());
+    return false;
+  }
 
   CefMainArgs arguments(GetModuleHandleW(nullptr));
   CefSettings settings;
@@ -48,10 +61,11 @@ bool CefRuntime::Initialize(const std::filesystem::path& game_root) {
       (native_root / L"ProjectLiberty.CefSubprocess.exe").wstring();
   CefString(&settings.resources_dir_path) = native_root.wstring();
   CefString(&settings.locales_dir_path) = (native_root / L"locales").wstring();
-  CefString(&settings.cache_path) =
-      (content_root / L"Cache" / L"CEF").wstring();
+  CefString(&settings.root_cache_path) = cache_root.wstring();
+  CefString(&settings.cache_path) = cache_root.wstring();
+  CefString(&settings.user_agent_product) = "ProjectLiberty/0.1";
   CefString(&settings.log_file) =
-      (content_root / L"Logs" / L"cef-runtime.log").wstring();
+      (logs_root / L"cef-runtime.log").wstring();
 
   auto application = new LibertyCefApp();
   if (!CefInitialize(arguments, settings, application, nullptr)) {

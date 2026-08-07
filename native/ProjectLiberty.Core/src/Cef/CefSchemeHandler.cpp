@@ -1,6 +1,7 @@
 #include "Cef/CefSchemeHandler.h"
 
 #include <algorithm>
+#include <cctype>
 #include <unordered_map>
 
 #include "Logging/NativeLogger.h"
@@ -12,8 +13,11 @@ namespace liberty {
 namespace {
 
 bool IsWithin(const std::filesystem::path& candidate, const std::filesystem::path& root) {
-  const auto canonical_candidate = std::filesystem::weakly_canonical(candidate);
-  const auto canonical_root = std::filesystem::weakly_canonical(root);
+  std::error_code error;
+  const auto canonical_candidate = std::filesystem::weakly_canonical(candidate, error);
+  if (error) return false;
+  const auto canonical_root = std::filesystem::weakly_canonical(root, error);
+  if (error) return false;
   auto root_iterator = canonical_root.begin();
   auto candidate_iterator = canonical_candidate.begin();
   for (; root_iterator != canonical_root.end(); ++root_iterator, ++candidate_iterator) {
@@ -43,6 +47,28 @@ std::string MimeType(const std::filesystem::path& path) {
   return iterator == types.end() ? "application/octet-stream" : iterator->second;
 }
 
+bool IsSafeModName(const std::string& value) {
+  return !value.empty() && value.size() <= 64 &&
+      std::ranges::all_of(value, [](const unsigned char character) {
+        return std::isalnum(character) || character == '-' || character == '_';
+      });
+}
+
+CefResponse::HeaderMap SecurityHeaders(const std::filesystem::path& path) {
+  CefResponse::HeaderMap headers;
+  headers.emplace("Content-Security-Policy",
+      "default-src 'self' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+      "img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; object-src 'none'; "
+      "frame-src 'none'; base-uri 'none'; form-action 'none'");
+  headers.emplace("X-Content-Type-Options", "nosniff");
+  headers.emplace("Referrer-Policy", "no-referrer");
+  headers.emplace("Cross-Origin-Resource-Policy", "same-origin");
+  const auto extension = path.extension().string();
+  headers.emplace("Cache-Control", extension == ".html" || extension == ".htm"
+      ? "no-cache" : "public, max-age=31536000, immutable");
+  return headers;
+}
+
 }  // namespace
 
 LibertySchemeHandlerFactory::LibertySchemeHandlerFactory(std::filesystem::path content_root)
@@ -51,6 +77,7 @@ LibertySchemeHandlerFactory::LibertySchemeHandlerFactory(std::filesystem::path c
 CefRefPtr<CefResourceHandler> LibertySchemeHandlerFactory::Create(
     CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>, const CefString&,
     CefRefPtr<CefRequest> request) {
+  if (!request || request->GetMethod() != "GET") return nullptr;
   CefURLParts parts;
   if (!CefParseURL(request->GetURL(), parts)) return nullptr;
   const std::string host = CefString(&parts.host);
@@ -65,21 +92,26 @@ CefRefPtr<CefResourceHandler> LibertySchemeHandlerFactory::Create(
     const auto separator = relative.find('/');
     if (separator == std::string::npos) return nullptr;
     const auto mod_name = relative.substr(0, separator);
-    if (mod_name.empty() || mod_name == "." || mod_name == ".." ||
-        mod_name.find('\\') != std::string::npos) return nullptr;
+    if (!IsSafeModName(mod_name)) return nullptr;
     root = content_root_ / L"mods" / Utf8Path(mod_name) / L"ui";
     relative.erase(0, separator + 1);
     if (relative.empty()) relative = "index.html";
   }
   else return nullptr;
   const auto candidate = root / Utf8Path(relative);
-  if (!IsWithin(candidate, root) || !std::filesystem::is_regular_file(candidate)) {
+  std::error_code file_error;
+  const auto file_size = std::filesystem::file_size(candidate, file_error);
+  const auto regular_file = std::filesystem::is_regular_file(candidate, file_error);
+  if (!IsWithin(candidate, root) || !regular_file ||
+      file_error || file_size > 64 * 1024 * 1024) {
     NativeLogger::Instance().Warning("[CEF] Blocked or missing liberty resource: " +
                                      request->GetURL().ToString());
     return nullptr;
   }
   const auto stream = CefStreamReader::CreateForFile(candidate.wstring());
-  return stream ? new CefStreamResourceHandler(MimeType(candidate), stream) : nullptr;
+  return stream ? new CefStreamResourceHandler(200, "OK", MimeType(candidate),
+                                                SecurityHeaders(candidate), stream)
+                : nullptr;
 }
 
 }  // namespace liberty

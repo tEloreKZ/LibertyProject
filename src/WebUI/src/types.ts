@@ -5,6 +5,7 @@ export interface CharacterCard {
   fullName: string
   gender: string
   active: boolean
+  portrait?: string | null
 }
 
 export interface EditorRow {
@@ -12,7 +13,11 @@ export interface EditorRow {
   label: string
   value: string
   secondaryValue?: string | null
-  kind?: 'value' | 'text'
+  kind?: 'value' | 'text' | 'slider'
+  numericValue?: number | null
+  min?: number
+  max?: number
+  step?: number
 }
 
 export interface EditorState {
@@ -29,19 +34,9 @@ export interface EditorState {
 export interface UiState {
   type: 'state'
   view: ViewName
+  language: string
+  translations: Record<string, string>
   characters: CharacterCard[]
   activeSlot: number | null
   editor?: EditorState
 }
-
-export interface PointerMessage {
-  type: 'pointer'
-  x: number
-  y: number
-  down: boolean
-  pressed: boolean
-  released: boolean
-  wheel: number
-}
-
-export type HostMessage = UiState | PointerMessage

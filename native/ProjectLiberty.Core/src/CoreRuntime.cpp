@@ -32,7 +32,7 @@ DWORD CoreRuntime::Run() {
   wchar_t module_path[MAX_PATH]{};
   if (!GetModuleFileNameW(module_, module_path, MAX_PATH)) return 1;
   game_root_ = std::filesystem::path(module_path).parent_path();
-  const auto project_root = game_root_ / L"ProjectLiberty";
+  const auto project_root = game_root_ / L"scripts" / L"ProjectLiberty";
   const auto native_root = project_root / L"Native";
   NativeLogger::Instance().Initialize(project_root / L"Logs");
   NativeLogger::Instance().Info("Native ProjectLiberty.Core starting");

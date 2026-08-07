@@ -6,6 +6,29 @@
 
 ## Root Directory
 
+### Installed GTA layout
+
+Only the ASI loader must remain in the GTA root. All Project Liberty runtime data is consolidated under the SHVDN scripts directory:
+
+```text
+Grand Theft Auto V Enhanced/
+├── ProjectLiberty.Core.asi
+└── scripts/
+    ├── LibertyScript.dll
+    └── ProjectLiberty/
+        ├── Core/       # managed libraries
+        ├── Native/     # CEF runtime and subprocess
+        ├── UI/         # React production/test bundles
+        ├── Config/
+        ├── Languages/
+        ├── Plugins/
+        ├── Saves/      # character JSON and generated portraits
+        ├── Cache/
+        └── Logs/
+```
+
+Use `Build/Install-Gta.ps1` to install and migrate the obsolete root-level `ProjectLiberty` directory safely.
+
 ```
 ProjectLiberty/
 в”њв”Ђв”Ђ native/                       # Independent native CEF/Core ASI

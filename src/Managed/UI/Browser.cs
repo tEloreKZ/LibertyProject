@@ -23,6 +23,7 @@ public sealed class Browser : IDisposable
     public static Browser Create(string url, BrowserOptions? options = null)
     {
         if (string.IsNullOrWhiteSpace(url)) throw new ArgumentException("URL is required.", nameof(url));
+        if (url.Length > 2048) throw new ArgumentException("URL cannot exceed 2048 characters.", nameof(url));
         if (!url.StartsWith("liberty://ui/", StringComparison.Ordinal) &&
             !url.StartsWith("liberty://mods/", StringComparison.Ordinal))
             throw new ArgumentException("Only liberty://ui and liberty://mods URLs are allowed.", nameof(url));
@@ -68,6 +69,7 @@ public sealed class Browser : IDisposable
     {
         ThrowIfDisposed();
         if (string.IsNullOrWhiteSpace(url)) throw new ArgumentException("URL is required.", nameof(url));
+        if (url.Length > 2048) throw new ArgumentException("URL cannot exceed 2048 characters.", nameof(url));
         if (!url.StartsWith("liberty://ui/", StringComparison.Ordinal) &&
             !url.StartsWith("liberty://mods/", StringComparison.Ordinal))
             throw new ArgumentException("Only liberty://ui and liberty://mods URLs are allowed.", nameof(url));
@@ -78,7 +80,8 @@ public sealed class Browser : IDisposable
     public void SetBounds(int x, int y, int width, int height)
     {
         ThrowIfDisposed();
-        if (width <= 0 || height <= 0) throw new ArgumentOutOfRangeException(nameof(width));
+        if (width <= 0 || height <= 0 || width > 8192 || height > 8192 ||
+            (long)width * height > 16 * 1024 * 1024) throw new ArgumentOutOfRangeException(nameof(width));
         BrowserRuntime.ThrowIfFailed("SetBrowserBounds",
             NativeMethods.Liberty_SetBrowserBounds(Id, x, y, width, height));
     }
@@ -91,6 +94,8 @@ public sealed class Browser : IDisposable
         ThrowIfDisposed();
         ValidateEventName(eventName);
         var json = JsonConvert.SerializeObject(data);
+        if (System.Text.Encoding.UTF8.GetByteCount(json) > 1024 * 1024)
+            throw new ArgumentException("Browser event payload cannot exceed 1 MiB.", nameof(data));
         using var name = new Utf8String(eventName);
         using var payload = new Utf8String(json);
         BrowserRuntime.ThrowIfFailed("BrowserEmit",

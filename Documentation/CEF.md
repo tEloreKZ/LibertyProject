@@ -29,7 +29,7 @@ GTA V / ASI loader
 
 ## Lifecycle and ownership
 
-The ASI loader loads `ProjectLiberty.Core.asi` from the GTA V root. A native worker initializes logging, adds `ProjectLiberty/Native` to the DLL search path, initializes CEF and installs the DXGI hooks. CEF uses its multi-threaded message loop and a separate subprocess. On Windows, CEF 150 uses the official `bootstrap.exe`, deployed as `ProjectLiberty.CefSubprocess.exe`; the bootstrap loads the same-basename client module `ProjectLiberty.CefSubprocess.dll`. The runtime deployment also includes the mandatory `v8_context_snapshot.bin`.
+The ASI loader loads `ProjectLiberty.Core.asi` from the GTA V root. A native worker initializes logging, adds `scripts/ProjectLiberty/Native` to the DLL search path, initializes CEF and installs the DXGI hooks. CEF uses its multi-threaded message loop and a separate subprocess. On Windows, CEF 150 uses the official `bootstrap.exe`, deployed as `ProjectLiberty.CefSubprocess.exe`; the bootstrap loads the same-basename client module `ProjectLiberty.CefSubprocess.dll`. The runtime deployment also includes the mandatory `v8_context_snapshot.bin`.
 
 The production browser is created lazily on the first F2 press. Loading Story Mode initializes the native service but does not create a renderer or network-service process merely for a hidden page.
 
@@ -49,6 +49,8 @@ CEF OnPaint BGRA buffer
 ```
 
 `IGraphicsBackend` separates browser management from the graphics API. Legacy GTA V uses the direct D3D11 path. GTA V Enhanced captures its D3D12 command queue and creates an official D3D11-on-12 interop device, allowing the same compositor to draw into wrapped D3D12 swap-chain buffers. Dirty rectangles are copied and uploaded independently instead of transferring the complete browser surface for small changes.
+
+On GTA V Enhanced the hot `ExecuteCommandLists` hook stays disabled while no CEF browser is visible. It is enabled on demand when the first UI surface needs D3D12 interop, forwards GTA's submission before capturing the direct queue, and becomes an atomic fast path after the first successful capture. This prevents an idle CEF service from adding work to every D3D12 submission during Story Mode startup.
 
 The DXGI hook is installed once by native core. Resize invalidates the render target and browser bounds notify CEF through `WasResized`.
 
@@ -99,10 +101,25 @@ browser.LoadUrl("liberty://ui/another/index.html");
 
 Absolute `file://` URLs are rejected. The native scheme handler accepts only:
 
-- `liberty://ui/<path>` from `GTA V/ProjectLiberty/ui/<path>`;
-- `liberty://mods/<mod-name>/<path>` from `GTA V/ProjectLiberty/mods/<mod-name>/ui/<path>`.
+- `liberty://ui/<path>` from `GTA V/scripts/ProjectLiberty/UI/<path>`;
+- `liberty://mods/<mod-name>/<path>` from `GTA V/scripts/ProjectLiberty/Mods/<mod-name>/UI/<path>`.
 
-Paths are canonicalized and must stay below the selected root, preventing `..` traversal. Only a MIME allow-list is served. This is the foundation for a future per-mod permission system; it is not a full sandbox for trusted managed plugins.
+Paths are canonicalized without throwing across the native boundary and must stay below the selected root, preventing `..` traversal. Mod names accept only ASCII letters, digits, `-` and `_`. Only `GET` requests and regular files up to 64 MiB are served. Every response includes a restrictive content-security policy, MIME sniffing protection, a no-referrer policy and same-origin resource policy. This is the foundation for a future per-mod permission system; it is not a full sandbox for trusted managed plugins.
+
+## Production hardening phase 1
+
+The first production pass establishes hard resource boundaries at both the managed and native API layers:
+
+- at most 16 browsers globally and 4 browsers per owner;
+- browser surfaces up to 8192 pixels per dimension and 16 megapixels total;
+- URLs up to 2048 bytes, owner ids up to 128 bytes and event names up to 128 bytes;
+- event payloads up to 1 MiB;
+- the native event queue is bounded to 1024 entries and 16 MiB, evicting the oldest events under sustained backpressure;
+- hiding a browser also releases its CEF focus;
+- loss of the GTA window focus releases browser focus and mouse state;
+- cache and log directories are validated before `CefInitialize`, with an explicit CEF root cache path.
+
+Renderer crash recovery remains protected by the existing circuit breaker: no more than three reloads in 30 seconds. These limits are defense in depth; the native layer validates all calls even when a third-party managed client bypasses `ProjectLiberty.Managed`.
 
 ## Dependencies and build
 
@@ -129,8 +146,9 @@ Copy the contents of `output/gta-root` into the GTA V root, preserving this layo
 ```text
 GTA V/
   ProjectLiberty.Core.asi
-  ProjectLiberty/
-    Native/
+  scripts/
+    ProjectLiberty/
+      Native/
       ProjectLiberty.CefSubprocess.exe
       ProjectLiberty.CefSubprocess.dll
       libcef.dll
@@ -138,12 +156,11 @@ GTA V/
       v8_context_snapshot.bin
       resources.pak and other CEF runtime files
       locales/
-    ui/cef-test/
-    Logs/
-    Cache/CEF/
-  scripts/
+      UI/cef-test/
+      Logs/
+      Cache/CEF/
+      Core/ProjectLiberty.Managed.dll
     LibertyScript.dll
-    ProjectLiberty/Core/ProjectLiberty.Managed.dll
 ```
 
 An ASI loader, ScriptHookV and ScriptHookVDotNet 3.x must be installed. Microsoft Edge WebView2 is not used or required.
@@ -159,14 +176,14 @@ An ASI loader, ScriptHookV and ScriptHookVDotNet 3.x must be installed. Microsof
 7. Press F10 again to test hide/unfocus and reopening.
 8. Reload SHVDN scripts. The native core and CEF process must stay alive; the script-owned test browser is cleaned up and can be recreated.
 
-Diagnostics are written to `ProjectLiberty/Logs/cef.log` and CEF warnings to `ProjectLiberty/Logs/cef-runtime.log`. The official x64 bootstrap provides the process startup contract required by CEF 150. Do not omit `ProjectLiberty.CefSubprocess.dll` or `v8_context_snapshot.bin` when deploying the native runtime.
+Diagnostics are written to `scripts/ProjectLiberty/Logs/cef.log` and CEF warnings to `scripts/ProjectLiberty/Logs/cef-runtime.log`. The official x64 bootstrap provides the process startup contract required by CEF 150. Do not omit `ProjectLiberty.CefSubprocess.dll` or `v8_context_snapshot.bin` when deploying the native runtime.
 
 ## Current limitations
 
 - The MVP uses CPU `OnPaint` uploads; accelerated shared textures are prepared architecturally but not implemented.
 - D3D11 and D3D12 through D3D11-on-12 are supported. Vulkan is not currently supported.
 - Input interception is Win32-message based. GTA/controller-specific action blocking and IME composition need further in-game validation.
-- Browser ownership is enforced for cleanup, but a full per-plugin permission and quota manager is deferred.
+- Browser ownership and resource quotas are enforced, but a full per-plugin capability/permission manager is deferred.
 - Crash recovery is bounded; restoration of application UI state remains the page/plugin's responsibility.
 - Automated builds validate compilation and managed logic; presentation, alpha blending and GTA shutdown require an in-game smoke test on the target GTA/ScriptHook versions.
 

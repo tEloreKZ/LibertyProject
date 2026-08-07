@@ -124,6 +124,8 @@ mkdir "output\Languages\en"
 mkdir "output\Languages\ru"
 copy "Languages\en\core.json" "output\Languages\en\" >nul
 copy "Languages\ru\core.json" "output\Languages\ru\" >nul
+copy "Languages\en\ui.json" "output\Languages\en\" >nul
+copy "Languages\ru\ui.json" "output\Languages\ru\" >nul
 
 echo Creating scripts deployment folder...
 mkdir "output\scripts"
@@ -170,6 +172,8 @@ mkdir "output\scripts\ProjectLiberty\Languages\en"
 mkdir "output\scripts\ProjectLiberty\Languages\ru"
 copy "Languages\en\core.json" "output\scripts\ProjectLiberty\Languages\en\" >nul
 copy "Languages\ru\core.json" "output\scripts\ProjectLiberty\Languages\ru\" >nul
+copy "Languages\en\ui.json" "output\scripts\ProjectLiberty\Languages\en\" >nul
+copy "Languages\ru\ui.json" "output\scripts\ProjectLiberty\Languages\ru\" >nul
 copy "Assets\UI\dashboard-background.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
 copy "Assets\UI\officer.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
 copy "Assets\UI\dashboard-shell.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
@@ -184,9 +188,9 @@ echo Creating complete GTA root deployment...
 mkdir "output\gta-root"
 xcopy "Build\Native\deploy\*" "output\gta-root\" /E /I /Y >nul
 xcopy "output\scripts\*" "output\gta-root\scripts\" /E /I /Y >nul
-mkdir "output\gta-root\ProjectLiberty\ui\cef-test"
-xcopy "ui\cef-test\dist\*" "output\gta-root\ProjectLiberty\ui\cef-test\" /E /I /Y >nul
-xcopy "src\WebUI\dist\*" "output\gta-root\ProjectLiberty\ui\" /E /I /Y >nul
+mkdir "output\gta-root\scripts\ProjectLiberty\UI\cef-test"
+xcopy "ui\cef-test\dist\*" "output\gta-root\scripts\ProjectLiberty\UI\cef-test\" /E /I /Y >nul
+xcopy "src\WebUI\dist\*" "output\gta-root\scripts\ProjectLiberty\UI\" /E /I /Y >nul
 
 echo.
 echo ========================================
