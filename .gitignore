@@ -1,12 +1,82 @@
+# IDE and editor-local state
 .vs/
 .idea/
+.vscode/
+.fleet/
 .windsurf/
-**/bin/
-**/obj/
-output/
-Logs/
-TestResults/
 *.user
 *.suo
-*.nupkg
+*.userosscache
+*.sln.docstates
 
+# .NET / test / package output
+**/bin/
+**/obj/
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+*.nupkg
+packages/
+artifacts/
+
+# Project deployment and native build output
+output/
+Build/UiHost/
+Build/Native/
+Build/cef-*/
+Build/cef[0-9]*/
+Build/cef*.tar.bz2
+Build/cef*.tar.gz
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+CMakeUserPresets.json
+
+# Downloaded third-party SDKs and archives (restored by Build/Setup-Cef.ps1)
+third_party/cef/
+third_party/cef_*.tar.bz2
+third_party/cef_*.tar.gz
+third_party/minhook-*.tar.gz
+
+# Node / React generated files
+**/node_modules/
+**/dist/
+**/.vite/
+**/*.tsbuildinfo
+**/vite.config.js
+**/vite.config.d.ts
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local GTA/CEF runtime state
+Logs/
+Saves/
+cef_debug.log
+debug.log
+*.dmp
+*.mdmp
+*.crash
+
+# Local secrets and machine-specific environment
+.env
+.env.*
+!.env.example
+*.local
+
+# Python caches used by asset generation scripts
+**/__pycache__/
+*.py[cod]
+
+# OS and temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.bak
+*~

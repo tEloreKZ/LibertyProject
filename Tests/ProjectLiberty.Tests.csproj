@@ -21,6 +21,7 @@
     <ProjectReference Include="..\src\EventBus\ProjectLiberty.EventBus.csproj" />
     <ProjectReference Include="..\src\GameHost\ProjectLiberty.GameHost.csproj" />
     <ProjectReference Include="..\src\Localization\ProjectLiberty.Localization.csproj" />
+    <ProjectReference Include="..\src\Managed\ProjectLiberty.Managed.csproj" />
     <ProjectReference Include="..\src\PluginSystem\ProjectLiberty.PluginSystem.csproj" />
   </ItemGroup>
 </Project>

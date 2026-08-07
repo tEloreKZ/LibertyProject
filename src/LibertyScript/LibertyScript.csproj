@@ -19,10 +19,50 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\ProjectLiberty.Core.csproj" />
     <ProjectReference Include="..\GameHost\ProjectLiberty.GameHost.csproj" />
+    <ProjectReference Include="..\Managed\ProjectLiberty.Managed.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ScriptHookVDotNet3" Version="3.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\Assets\UI\dashboard-background.png" Link="ProjectLiberty\Assets\UI\dashboard-background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\officer.png" Link="ProjectLiberty\Assets\UI\officer.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\dashboard-shell.png" Link="ProjectLiberty\Assets\UI\dashboard-shell.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\dashboard-shell-1280x720.png" Link="ProjectLiberty\Assets\UI\dashboard-shell-1280x720.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\dashboard-shell-1920x1080.png" Link="ProjectLiberty\Assets\UI\dashboard-shell-1920x1080.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\dashboard-shell-2560x1440.png" Link="ProjectLiberty\Assets\UI\dashboard-shell-2560x1440.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\dashboard-shell-3840x2160.png" Link="ProjectLiberty\Assets\UI\dashboard-shell-3840x2160.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\white-pixel.png" Link="ProjectLiberty\Assets\UI\white-pixel.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\cursor.png" Link="ProjectLiberty\Assets\UI\cursor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\project-liberty-logo.png" Link="ProjectLiberty\Assets\UI\project-liberty-logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\empty-dashboard-*.png" Link="ProjectLiberty\Assets\UI\%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Assets\UI\character-editor-*.png" Link="ProjectLiberty\Assets\UI\%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

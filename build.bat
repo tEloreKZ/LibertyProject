@@ -1,6 +1,50 @@
 @echo off
 echo Building Project Liberty...
 
+REM Build the React + TypeScript UI served by native CEF.
+node --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ERROR: Node.js is not installed.
+    if not defined CI pause
+    exit /b 1
+)
+
+echo Building React UI...
+pushd "src\WebUI"
+call npm ci
+if %errorlevel% neq 0 (
+    popd
+    echo ERROR: Failed to install React UI dependencies
+    if not defined CI pause
+    exit /b 1
+)
+call npm run build
+if %errorlevel% neq 0 (
+    popd
+    echo ERROR: Failed to build React UI
+    if not defined CI pause
+    exit /b 1
+)
+popd
+
+echo Building React CEF test UI...
+pushd "ui\cef-test"
+call npm ci
+if %errorlevel% neq 0 (
+    popd
+    echo ERROR: Failed to install CEF test UI dependencies
+    if not defined CI pause
+    exit /b 1
+)
+call npm run build
+if %errorlevel% neq 0 (
+    popd
+    echo ERROR: Failed to build CEF test UI
+    if not defined CI pause
+    exit /b 1
+)
+popd
+
 REM Check if dotnet is installed
 dotnet --version >nul 2>&1
 if %errorlevel% neq 0 (
@@ -30,6 +74,14 @@ echo Running tests...
 dotnet test "Tests\ProjectLiberty.Tests.csproj" --configuration Release --no-build --no-restore
 if %errorlevel% neq 0 (
     echo ERROR: Tests failed
+    if not defined CI pause
+    exit /b 1
+)
+
+echo Building native CEF service...
+powershell -NoProfile -ExecutionPolicy Bypass -File "Build\Build-Native.ps1" -Configuration Release
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to build native CEF service
     if not defined CI pause
     exit /b 1
 )
@@ -80,6 +132,9 @@ mkdir "output\scripts\ProjectLiberty\Core"
 mkdir "output\scripts\ProjectLiberty\Config"
 mkdir "output\scripts\ProjectLiberty\Logs"
 mkdir "output\scripts\ProjectLiberty\Plugins"
+mkdir "output\scripts\ProjectLiberty\Assets"
+mkdir "output\scripts\ProjectLiberty\Assets\UI"
+mkdir "output\scripts\ProjectLiberty\Saves"
 
 echo Copying Core DLLs...
 copy "src\Abstractions\bin\Release\net48\ProjectLiberty.Abstractions.dll" "output\scripts\ProjectLiberty\Core\" >nul
@@ -91,6 +146,7 @@ copy "src\Localization\bin\Release\net48\ProjectLiberty.Localization.dll" "outpu
 copy "src\Configuration\bin\Release\net48\ProjectLiberty.Configuration.dll" "output\scripts\ProjectLiberty\Core\" >nul
 copy "src\Logging\bin\Release\net48\ProjectLiberty.Logging.dll" "output\scripts\ProjectLiberty\Core\" >nul
 copy "src\UI\bin\Release\net48\ProjectLiberty.UI.dll" "output\scripts\ProjectLiberty\Core\" >nul
+copy "src\Managed\bin\Release\net48\ProjectLiberty.Managed.dll" "output\scripts\ProjectLiberty\Core\" >nul
 
 echo Copying Newtonsoft.Json.dll to Core...
 copy "src\LibertyScript\bin\Release\net48\Newtonsoft.Json.dll" "output\scripts\ProjectLiberty\Core\" >nul
@@ -104,10 +160,7 @@ if exist "src\LibertyScript\bin\Release\net48\LibertyScript.dll" (
 )
 
 echo Copying plugins...
-if exist "Plugins\TestPlugin\bin\Release\net48\TestPlugin.dll" (
-    mkdir "output\scripts\ProjectLiberty\Plugins\TestPlugin"
-    copy "Plugins\TestPlugin\bin\Release\net48\TestPlugin.dll" "output\scripts\ProjectLiberty\Plugins\TestPlugin\" >nul
-)
+REM TestPlugin is an SDK/test fixture and is intentionally not deployed into GTA.
 
 echo Copying configuration files...
 copy "Config\core.json" "output\scripts\ProjectLiberty\Config\" >nul
@@ -117,16 +170,34 @@ mkdir "output\scripts\ProjectLiberty\Languages\en"
 mkdir "output\scripts\ProjectLiberty\Languages\ru"
 copy "Languages\en\core.json" "output\scripts\ProjectLiberty\Languages\en\" >nul
 copy "Languages\ru\core.json" "output\scripts\ProjectLiberty\Languages\ru\" >nul
+copy "Assets\UI\dashboard-background.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
+copy "Assets\UI\officer.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
+copy "Assets\UI\dashboard-shell.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
+copy "Assets\UI\dashboard-shell-*.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
+copy "Assets\UI\white-pixel.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
+copy "Assets\UI\cursor.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
+copy "Assets\UI\project-liberty-logo.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
+copy "Assets\UI\empty-dashboard-*.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
+copy "Assets\UI\character-editor-*.png" "output\scripts\ProjectLiberty\Assets\UI\" >nul
+
+echo Creating complete GTA root deployment...
+mkdir "output\gta-root"
+xcopy "Build\Native\deploy\*" "output\gta-root\" /E /I /Y >nul
+xcopy "output\scripts\*" "output\gta-root\scripts\" /E /I /Y >nul
+mkdir "output\gta-root\ProjectLiberty\ui\cef-test"
+xcopy "ui\cef-test\dist\*" "output\gta-root\ProjectLiberty\ui\cef-test\" /E /I /Y >nul
+xcopy "src\WebUI\dist\*" "output\gta-root\ProjectLiberty\ui\" /E /I /Y >nul
 
 echo.
 echo ========================================
 echo DEPLOYMENT INSTRUCTIONS:
 echo ========================================
 echo.
-echo For ScriptHookVDotNet (GTA V):
-echo   - Copy all files from output\scripts\ to GTA V\scripts\
+echo For GTA V:
+echo   - Copy all files from output\gta-root\ to the GTA V root directory
+echo   - Install an ASI loader, ScriptHookV, and ScriptHookVDotNet 3.x
 echo   - Launch GTA V
-echo   - LibertyScript will automatically initialize Project Liberty
+echo   - ProjectLiberty.Core.asi owns CEF; LibertyScript is only a managed client
 echo.
 echo For standalone testing:
 echo   - Run output\ProjectLiberty.EntryPoint.exe

@@ -1,6 +1,0 @@
-G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net8.0\LibertyScript.csproj.AssemblyReference.cache
-G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net8.0\LibertyScript.GeneratedMSBuildEditorConfig.editorconfig
-G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net8.0\LibertyScript.AssemblyInfoInputs.cache
-G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net8.0\LibertyScript.AssemblyInfo.cs
-G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net8.0\LibertyScript.csproj.CoreCompileInputs.cache
-G:\ProjectLiberty\LibertyProject\src\LibertyScript\obj\Release\net8.0\LibertyScript.sourcelink.json

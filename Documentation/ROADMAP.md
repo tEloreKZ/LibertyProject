@@ -65,6 +65,10 @@ The architecture foundation is implemented and is being stabilized with reproduc
 - [x] Create solution file
 - [x] Set up build system
 - [x] Configure CI/CD
+- [x] Add independent native CEF OSR foundation
+- [x] Add native BrowserManager, D3D11 rendering and Win32 input
+- [x] Add lifecycle-safe managed Browser API and JS event bridge
+- [x] Add `liberty://` resource scheme and round-trip test UI
 
 ### Deliverables
 

@@ -29,6 +29,8 @@ Project Liberty follows Clean Architecture principles with clear separation betw
 - **Performance-Optimized**: Minimal overhead and efficient resource usage
 - **ScriptHookVDotNet Integrated**: Built for GTA V modding with .NET Framework 4.8
 
+The presentation runtime is a deliberate exception to the managed application boundary: CEF belongs to the independently loaded native `ProjectLiberty.Core.asi`. SHVDN and other .NET plugins consume only `ProjectLiberty.Managed` and BrowserIds through a C ABI. Managed reload therefore cannot tear down Chromium, DXGI hooks or native input. See [CEF.md](CEF.md) for the subsystem architecture and thread/lifecycle rules.
+
 ---
 
 ## Design Principles

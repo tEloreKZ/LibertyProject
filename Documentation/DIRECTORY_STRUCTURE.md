@@ -8,6 +8,8 @@
 
 ```
 ProjectLiberty/
+в”њв”Ђв”Ђ native/                       # Independent native CEF/Core ASI
+в”њв”Ђв”Ђ ui/                           # CEF web roots and test pages
 ├── src/                          # Source code
 ├── SDK/                          # Software Development Kit
 ├── Documentation/                # Documentation files
@@ -30,6 +32,8 @@ ProjectLiberty/
 ---
 
 ## Source Directory (src/)
+
+The managed tree also includes `src/Managed`, the stable .NET client for the native Browser C ABI. Native implementation details live under `native/ProjectLiberty.Core`; see [CEF.md](CEF.md) for the authoritative layout because the historical tree below documents the managed foundation.
 
 ```
 src/
