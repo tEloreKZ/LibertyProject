@@ -24,7 +24,7 @@ public class DependencyResolver
     {
         var pluginList = plugins.ToList();
         var loadOrder = new List<IPlugin>();
-        var loaded = new HashSet<string>();
+        var loaded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         _logger.LogInformation($"Resolving dependencies for {pluginList.Count} plugins...");
 
@@ -92,8 +92,14 @@ public class DependencyResolver
     public bool ValidateDependencies(IEnumerable<IPlugin> plugins)
     {
         var pluginList = plugins.ToList();
-        var pluginIds = new HashSet<string>(pluginList.Select(p => p.Manifest.Id));
+        var pluginIds = new HashSet<string>(pluginList.Select(p => p.Manifest.Id), StringComparer.OrdinalIgnoreCase);
         var valid = true;
+
+        foreach (var duplicate in pluginList.GroupBy(plugin => plugin.Manifest.Id, StringComparer.OrdinalIgnoreCase).Where(group => group.Count() > 1))
+        {
+            _logger.LogError($"Duplicate plugin ID: {duplicate.Key}");
+            valid = false;
+        }
 
         foreach (var plugin in pluginList)
         {

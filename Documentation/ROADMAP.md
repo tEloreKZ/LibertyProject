@@ -22,9 +22,9 @@ Project Liberty is developed in phases, each building upon the previous. This ro
 
 ### Current Status
 
-**Phase: Architecture Design**
+**Phase: Core Stabilization**
 
-Project Liberty is currently in the Architecture Design Phase. All core documentation is being written before any code implementation.
+The architecture foundation is implemented and is being stabilized with reproducible builds, tests, lifecycle fixes, and documentation alignment. Gameplay systems remain future work.
 
 ---
 
@@ -77,7 +77,7 @@ Project Liberty is currently in the Architecture Design Phase. All core document
 
 ## Phase 2: Core Systems
 
-**Status: Not Started**
+**Status: In Progress**
 
 ### Goals
 
@@ -351,6 +351,8 @@ Project Liberty is currently in the Architecture Design Phase. All core document
 
 #### Testing
 
+- [x] Add initial infrastructure unit tests
+- [x] Add CI build and test workflow
 - [ ] Complete unit tests
 - [ ] Complete integration tests
 - [ ] Complete system tests

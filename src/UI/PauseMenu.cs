@@ -13,7 +13,6 @@ public class PauseMenu : IPauseMenu
 {
     private readonly List<IPauseMenuItem> _items = new List<IPauseMenuItem>();
     private bool _isVisible = false;
-    private int _pauseMenuIndex = -1;
 
     public string Id { get; }
     public string Title { get; }

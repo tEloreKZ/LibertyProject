@@ -8,8 +8,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Abstractions\ProjectLiberty.Abstractions.csproj" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="..\..\Plugins\" />
-  </Target>
 </Project>

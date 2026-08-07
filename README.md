@@ -1,245 +1,101 @@
 # Project Liberty
 
-**Modern Open Platform for GTA V Police Roleplay Modifications**
+Project Liberty is an early-stage modular framework for police-roleplay modifications in GTA V Story Mode. The repository currently contains a working core foundation, ScriptHookVDotNet integration, configuration and localization services, an event bus, an in-process plugin system, basic UI prototypes, and automated infrastructure tests.
 
----
+> Status: core stabilization. Dispatch, traffic stops, callouts, arrests, AI, saves, Lua scripting, and production UI are planned but not implemented.
 
-## Overview
+## Current capabilities
 
-Project Liberty is a next-generation, modular platform for creating police roleplay modifications for GTA V Story Mode. It is designed to be the new standard for GTA V modding, providing a clean, extensible architecture that allows developers to create plugins, callouts, and scenarios without modifying the core system.
+- .NET Framework 4.8 runtime assemblies built with the .NET 8 SDK
+- abstraction boundary around the game host and native access
+- game loop explicitly advanced on the GTA main thread
+- synchronous and asynchronous event delivery with filters and priorities
+- trusted in-process plugin discovery, dependency ordering, and lifecycle management
+- dotted-path JSON configuration with atomic save and debounced hot reload
+- JSON localization with English and Russian resources
+- file and console logging
+- basic ScriptHookVDotNet menu prototype
+- standalone mock host and xUnit tests
 
-### Key Features
+## Important limitations
 
-- **Modular Architecture**: Every system can be disabled, replaced, or extended
-- **Clean Abstraction**: Complete separation between game core and GTA V interaction
-- **Plugin SDK**: Full-featured SDK for developing third-party modifications
-- **Scripting API**: Write custom scenarios without touching the core
-- **Event-Driven**: All systems communicate through events, no direct dependencies
-- **Multi-Language Support**: Full localization support for 11+ languages
-- **Hot Reload**: Development-friendly hot reload support
-- **Performance Optimized**: Minimal native calls, GC, CPU, and RAM usage
-
-### What Project Liberty Is NOT
-
-- **NOT** an LSPDFR clone or fork
-- **NOT** a quick MVP
-- **NOT** dependent on a specific GTA V loader
-- **NOT** limited to a single use case
-
----
+- Plugins are trusted .NET assemblies loaded into the main `AppDomain`. They are not sandboxed and cannot be truly unloaded without restarting the process.
+- Only ScriptHookVDotNet 3.x is implemented as a real game adapter today.
+- Hot reload applies to configuration files, not plugin assemblies or scripts.
+- The UI is a prototype and the planned gameplay systems are not present yet.
+- In-game behavior still requires manual validation in GTA V.
 
 ## Architecture
 
-Project Liberty is built on industry-standard architectural patterns:
-
-- **Clean Architecture**: Clear separation of concerns
-- **SOLID Principles**: Maintainable and extensible code
-- **Dependency Injection**: Loose coupling and testability
-- **Event-Driven**: Decoupled system communication
-- **Domain-Driven Design**: Where appropriate
-
-### Core Abstractions
-
-All game systems interact through abstraction layers:
-
-- `IGameHost` - Main game host interface
-- `INativeBridge` - Native function bridge
-- `IGameLoop` - Game loop management
-- `IEntityManager` - Entity management
-- `IPlayerManager` - Player management
-- `IVehicleManager` - Vehicle management
-- `IPedManager` - Ped management
-- `IWorldManager` - World management
-- `INativeInvoker` - Native function invocation
-
-**Direct ScriptHookVDotNet API calls are forbidden in game systems.**
-
----
-
-## Quick Start
-
-### Prerequisites
-
-- GTA V (Steam/Epic Games version)
-- ScriptHookVDotNet 3.x
-- .NET 8.0 SDK
-- Visual Studio 2022 or JetBrains Rider
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/your-org/ProjectLiberty.git
-cd ProjectLiberty
+```text
+LibertyScript (ScriptHookVDotNet entry point)
+    -> Core / Application lifecycle
+        -> Abstractions
+        -> GameHost
+        -> EventBus
+        -> PluginSystem
+        -> Configuration / Localization / Logging
+        -> UI
 ```
 
-2. Build the solution:
-```bash
-dotnet build
+Game-facing code advances `IGameLoop` from the ScriptHook tick. Core services and plugins should use abstractions instead of directly referencing ScriptHookVDotNet.
+
+## Prerequisites
+
+- Windows and .NET Framework 4.8
+- .NET 8 SDK
+- GTA V and ScriptHookVDotNet 3.x for in-game use
+- Visual Studio 2022 or Rider is optional
+
+## Build and test
+
+```powershell
+dotnet restore ProjectLiberty.sln
+dotnet build ProjectLiberty.sln --configuration Release --no-restore
+dotnet test Tests/ProjectLiberty.Tests.csproj --configuration Release --no-build --no-restore
 ```
 
-3. Copy build output to your GTA V `scripts` folder
+On Windows, `build.bat` performs restore, Release build, tests, and creates the deployment layout under `output\scripts`.
 
-4. Launch GTA V
+## GTA V deployment
 
-### Creating Your First Plugin
+1. Run `build.bat`.
+2. Copy the contents of `output\scripts` into the GTA V `scripts` directory.
+3. Ensure ScriptHookVDotNet 3.x is installed.
+4. Start GTA V. Project Liberty initializes through `LibertyScript.dll`.
 
-```csharp
-using ProjectLiberty.PluginSystem;
+F2 toggles the current prototype menu.
 
-public class MyFirstPlugin : Plugin
-{
-    public override string Name => "My First Plugin";
-    public override string Version => "1.0.0";
-    public override string Author => "Your Name";
+## Plugin layout
 
-    public override void Initialize()
-    {
-        // Plugin initialization logic
-    }
+Plugins use one directory per plugin:
 
-    public override void Load()
-    {
-        // Plugin load logic
-    }
-
-    public override void Enable()
-    {
-        // Plugin enable logic
-    }
-}
+```text
+ProjectLiberty/Plugins/MyPlugin/MyPlugin.dll
 ```
 
-See [PLUGIN_SDK.md](Documentation/PLUGIN_SDK.md) for detailed guide.
+The assembly may contain one or more concrete `IPlugin` implementations with parameterless constructors. Treat plugins as fully trusted code. See [Plugin SDK](Documentation/PLUGIN_SDK.md) for the current contract.
 
----
+## Configuration and localization
 
-## Documentation
+Core configuration lives in `Config/core.json` and is addressed with dotted keys such as `game.tickRate`. English and Russian translations live under `Languages/en` and `Languages/ru`.
 
-### Core Documentation
+## Repository map
 
-- [ARCHITECTURE.md](Documentation/ARCHITECTURE.md) - System architecture and design principles
-- [PROJECT_RULES.md](Documentation/PROJECT_RULES.md) - Development rules and guidelines
-- [CODING_STANDARDS.md](Documentation/CODING_STANDARDS.md) - C# coding standards
-- [DIRECTORY_STRUCTURE.md](Documentation/DIRECTORY_STRUCTURE.md) - Project structure reference
+- `src/Abstractions` — public contracts
+- `src/Core` — application lifecycle and composition
+- `src/GameHost` — game-host adapters and loop
+- `src/EventBus` — event delivery
+- `src/PluginSystem` — trusted plugin loading and lifecycle
+- `src/Configuration`, `Localization`, `Logging` — infrastructure services
+- `src/UI`, `LibertyScript` — ScriptHook-facing UI and entry point
+- `Tests` — automated core tests
+- `Documentation` — design documents; some describe planned architecture
 
-### System Documentation
+## Roadmap
 
-- [EVENT_BUS.md](Documentation/EVENT_BUS.md) - Event system architecture
-- [PLUGIN_SDK.md](Documentation/PLUGIN_SDK.md) - Plugin development guide
-- [SCRIPTING_API.md](Documentation/SCRIPTING_API.md) - Scripting API reference
-- [LOCALIZATION.md](Documentation/LOCALIZATION.md) - Localization system
-- [CONFIGURATION.md](Documentation/CONFIGURATION.md) - Configuration system
-- [SAVE_SYSTEM.md](Documentation/SAVE_SYSTEM.md) - Save system architecture
-
-### Feature Documentation
-
-- [DISPATCH.md](Documentation/DISPATCH.md) - Dispatch system
-- [TRAFFIC_STOPS.md](Documentation/TRAFFIC_STOPS.md) - Traffic stop system
-- [CALL_OUTS.md](Documentation/CALL_OUTS.md) - Callout system
-- [ARREST_SYSTEM.md](Documentation/ARREST_SYSTEM.md) - Arrest system
-- [AI_SYSTEM.md](Documentation/AI_SYSTEM.md) - AI architecture
-
-### Additional Documentation
-
-- [PERFORMANCE.md](Documentation/PERFORMANCE.md) - Performance guidelines
-- [ROADMAP.md](Documentation/ROADMAP.md) - Development roadmap
-- [CONTRIBUTING.md](Documentation/CONTRIBUTING.md) - Contribution guidelines
-- [LICENSE.md](Documentation/LICENSE.md) - Project license
-
----
-
-## Project Structure
-
-```
-ProjectLiberty/
-├── src/                    # Source code
-│   ├── Core/              # Core systems
-│   ├── Abstractions/      # Interface definitions
-│   ├── GameHost/          # Game host implementation
-│   ├── PluginSystem/      # Plugin system
-│   ├── EventBus/          # Event bus
-│   ├── Localization/      # Localization
-│   ├── Configuration/     # Configuration
-│   ├── SaveSystem/        # Save system
-│   ├── Logging/           # Logging
-│   ├── Dispatch/          # Dispatch system
-│   ├── TrafficStops/      # Traffic stops
-│   ├── Callouts/          # Callout system
-│   ├── ArrestSystem/      # Arrest system
-│   ├── AI/                # AI system
-│   └── ...                # Other systems
-├── SDK/                   # SDK for developers
-│   ├── Plugins/           # Plugin SDK
-│   ├── Callouts/          # Callout SDK
-│   ├── Scripts/           # Scripting SDK
-│   ├── Examples/          # Example code
-│   └── Templates/         # Project templates
-├── Documentation/         # Documentation
-├── Tests/                 # Tests
-├── Languages/             # Localization files
-├── Config/                # Configuration files
-├── Plugins/               # Installed plugins
-└── Scripts/               # Installed scripts
-```
-
-See [DIRECTORY_STRUCTURE.md](Documentation/DIRECTORY_STRUCTURE.md) for complete structure.
-
----
-
-## Supported Languages
-
-- English (en)
-- Russian (ru)
-- French (fr)
-- German (de)
-- Spanish (es)
-- Portuguese (pt)
-- Italian (it)
-- Polish (pl)
-- Ukrainian (uk)
-- Chinese (zh)
-- Japanese (ja)
-- Korean (ko)
-
-Additional languages can be added without code changes.
-
----
-
-## Development Status
-
-Project Liberty is currently in **Architecture Design Phase**.
-
-See [ROADMAP.md](Documentation/ROADMAP.md) for detailed development plan.
-
----
-
-## Contributing
-
-We welcome contributions! Please read [CONTRIBUTING.md](Documentation/CONTRIBUTING.md) for guidelines.
-
----
+The current roadmap and the distinction between implemented and planned features are maintained in [ROADMAP.md](Documentation/ROADMAP.md).
 
 ## License
 
-This project is licensed under the MIT License - see [LICENSE.md](Documentation/LICENSE.md) for details.
-
----
-
-## Contact
-
-- **Project Lead**: [Your Name]
-- **Discord**: [Server Link]
-- **GitHub**: [Repository Link]
-
----
-
-## Acknowledgments
-
-- Rockstar Games for GTA V
-- ScriptHookVDotNet team for the scripting framework
-- The GTA V modding community
-
----
-
-**Project Liberty - Setting the New Standard for GTA V Police Modding**
+Licensed under the [MIT License](LICENSE.md).

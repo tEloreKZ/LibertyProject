@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     ".NETFramework,Version=v4.8": {
+      "ScriptHookVDotNet3/3.6.0": {
+        "type": "package",
+        "compile": {
+          "lib/net48/ScriptHookVDotNet3.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net48/ScriptHookVDotNet3.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "ProjectLiberty.Abstractions/1.0.0": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.8",
@@ -15,6 +28,19 @@
     }
   },
   "libraries": {
+    "ScriptHookVDotNet3/3.6.0": {
+      "sha512": "YccOvaMnHtFsWuGaZoi2Q/HFj8yyjNBN3b18pvcYYF4JcbjZxR1+I319qaMxRsvW1+iCbBZareQaeq6OpUHotw==",
+      "type": "package",
+      "path": "scripthookvdotnet3/3.6.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net48/ScriptHookVDotNet3.dll",
+        "lib/net48/ScriptHookVDotNet3.xml",
+        "scripthookvdotnet3.3.6.0.nupkg.sha512",
+        "scripthookvdotnet3.nuspec"
+      ]
+    },
     "ProjectLiberty.Abstractions/1.0.0": {
       "type": "project",
       "path": "../Abstractions/ProjectLiberty.Abstractions.csproj",
@@ -23,7 +49,8 @@
   },
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.8": [
-      "ProjectLiberty.Abstractions >= 1.0.0"
+      "ProjectLiberty.Abstractions >= 1.0.0",
+      "ScriptHookVDotNet3 >= 3.6.0"
     ]
   },
   "packageFolders": {
@@ -62,6 +89,9 @@
           "NU1605"
         ]
       },
+      "restoreLockProperties": {
+        "restoreLockedMode": true
+      },
       "restoreAuditProperties": {
         "enableAudit": "true",
         "auditLevel": "low",
@@ -71,6 +101,12 @@
     "frameworks": {
       "net48": {
         "targetAlias": "net48",
+        "dependencies": {
+          "ScriptHookVDotNet3": {
+            "target": "Package",
+            "version": "[3.6.0, )"
+          }
+        },
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423\\RuntimeIdentifierGraph.json"
       }
     }

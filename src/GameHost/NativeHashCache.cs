@@ -1,5 +1,6 @@
 using ProjectLiberty.Abstractions.Logging;
 using System.Collections.Concurrent;
+using GTA.Native;
 
 namespace ProjectLiberty.GameHost;
 
@@ -29,11 +30,11 @@ public class NativeHashCache
     {
         if (_cache.TryGetValue(nativeName, out var hash))
         {
-            _hits++;
+            Interlocked.Increment(ref _hits);
             return hash;
         }
 
-        _misses++;
+        Interlocked.Increment(ref _misses);
 
         if (_useScriptHook)
         {
@@ -41,10 +42,9 @@ public class NativeHashCache
             {
                 hash = GetScriptHookHash(nativeName);
             }
-            catch
+            catch (Exception ex)
             {
-                // Fallback to simple hash if ScriptHook not available
-                hash = ComputeSimpleHash(nativeName);
+                throw new KeyNotFoundException($"Unknown GTA native name: {nativeName}", ex);
             }
         }
         else
@@ -62,31 +62,12 @@ public class NativeHashCache
     /// </summary>
     /// <param name="nativeName">Native function name.</param>
     /// <returns>Native hash.</returns>
-    private ulong GetScriptHookHash(string nativeName)
+    private static ulong GetScriptHookHash(string nativeName)
     {
-        try
-        {
-            // Use reflection to call GTA.Native.Function.GetHash
-            var gtaNativeType = System.Type.GetType("GTA.Native.Function, ScriptHookVDotNet3");
-            if (gtaNativeType != null)
-            {
-                var getHashMethod = gtaNativeType.GetMethod("GetHash", new[] { typeof(string) });
-                if (getHashMethod != null)
-                {
-                    var result = getHashMethod.Invoke(null, new object[] { nativeName });
-                    if (result != null)
-                    {
-                        return (ulong)result;
-                    }
-                }
-            }
-        }
-        catch
-        {
-            // Fall through to simple hash
-        }
-
-        return ComputeSimpleHash(nativeName);
+        if (string.IsNullOrWhiteSpace(nativeName)) throw new ArgumentException("Native name cannot be empty.", nameof(nativeName));
+        if (!Enum.TryParse(nativeName, true, out Hash nativeHash))
+            throw new KeyNotFoundException($"Unknown GTA native name: {nativeName}");
+        return (ulong)nativeHash;
     }
 
     /// <summary>
@@ -135,8 +116,10 @@ public class NativeHashCache
     /// </summary>
     public (int Cached, int Hits, int Misses, double HitRate) GetStats()
     {
-        var total = _hits + _misses;
-        var hitRate = total > 0 ? (double)_hits / total : 0.0;
-        return (_cache.Count, _hits, _misses, hitRate);
+        var hits = Volatile.Read(ref _hits);
+        var misses = Volatile.Read(ref _misses);
+        var total = hits + misses;
+        var hitRate = total > 0 ? (double)hits / total : 0.0;
+        return (_cache.Count, hits, misses, hitRate);
     }
 }

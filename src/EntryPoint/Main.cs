@@ -10,7 +10,7 @@ public class Program
 {
     private static Application? _application;
     private static ServiceBootstrap? _bootstrap;
-    private static bool _initialized = false;
+    private static ProjectLiberty.Core.DependencyInjection.ServiceContainer? _container;
 
     public static void Main(string[] args)
     {
@@ -27,11 +27,11 @@ public class Program
             
             // Configure services
             Console.WriteLine("Configuring services...");
-            var container = _bootstrap.ConfigureServices();
+            _container = _bootstrap.ConfigureServices();
             
             // Get application
             Console.WriteLine("Getting application...");
-            _application = container.GetService<Application>();
+            _application = _container.GetService<Application>();
             
             if (_application == null)
             {
@@ -45,8 +45,6 @@ public class Program
             // Run application
             Console.WriteLine("Running application...");
             _application.Run();
-            
-            _initialized = true;
             
             Console.WriteLine("Project Liberty initialized successfully");
         }
@@ -68,12 +66,11 @@ public class Program
         try
         {
             Console.WriteLine("Shutting down...");
-            if (_initialized)
-            {
-                _application?.Shutdown();
-                _application?.Dispose();
-                _initialized = false;
-            }
+            _application?.Shutdown();
+            _application?.Dispose();
+            _container?.Dispose();
+            _container = null;
+            _application = null;
             Console.WriteLine("Shutdown complete");
         }
         catch (Exception ex)

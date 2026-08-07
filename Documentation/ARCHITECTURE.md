@@ -591,9 +591,9 @@ Plugin Load → Dependency Resolution → Initialization → Enable → Event Su
 
 ### Plugin Sandboxing
 
-- Plugins run in isolated context
-- Limited access to native functions
-- Permission system for sensitive operations
+- Current plugins are trusted assemblies loaded into the main application domain.
+- `IPluginContext` limits the services exposed by the SDK, but it is not a security boundary.
+- True isolation, unloadability, and permissions are future work; do not install untrusted plugins.
 
 ### Input Validation
 

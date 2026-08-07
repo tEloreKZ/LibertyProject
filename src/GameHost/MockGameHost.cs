@@ -47,6 +47,8 @@ public class MockGameHost : IGameHost
             return;
 
         _logger.LogInformation("Initializing MockGameHost...");
+        _nativeBridge.Initialize();
+        _gameLoop.Start();
         _logger.LogInformation("MockGameHost initialized successfully");
         _initialized = true;
     }
@@ -57,6 +59,8 @@ public class MockGameHost : IGameHost
             return;
 
         _logger.LogInformation("Shutting down MockGameHost...");
+        _gameLoop.Stop();
+        _nativeBridge.Shutdown();
         _initialized = false;
         _logger.LogInformation("MockGameHost shut down");
     }

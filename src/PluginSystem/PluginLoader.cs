@@ -7,11 +7,12 @@ namespace ProjectLiberty.PluginSystem;
 /// <summary>
 /// Plugin loader - loads plugin assemblies.
 /// </summary>
-public class PluginLoader
+public class PluginLoader : IDisposable
 {
     private readonly ILogger _logger;
     private readonly string _pluginsDirectory;
     private readonly string _coreDirectory;
+    private bool _disposed;
 
     public PluginLoader(ILogger logger, string pluginsDirectory)
     {
@@ -50,6 +51,7 @@ public class PluginLoader
     /// <returns>Discovered plugins.</returns>
     public IEnumerable<IPlugin> DiscoverPlugins()
     {
+        if (_disposed) throw new ObjectDisposedException(nameof(PluginLoader));
         var plugins = new List<IPlugin>();
 
         if (!Directory.Exists(_pluginsDirectory))
@@ -59,7 +61,7 @@ public class PluginLoader
         }
 
         // Look for plugin subdirectories
-        var pluginDirectories = Directory.GetDirectories(_pluginsDirectory);
+        var pluginDirectories = Directory.GetDirectories(_pluginsDirectory).OrderBy(path => path, StringComparer.OrdinalIgnoreCase);
 
         foreach (var pluginDir in pluginDirectories)
         {
@@ -75,13 +77,15 @@ public class PluginLoader
             try
             {
                 var assembly = Assembly.LoadFrom(dllFile);
-                var pluginTypes = assembly.GetTypes()
+                var pluginTypes = GetLoadableTypes(assembly)
                     .Where(t => typeof(IPlugin).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
 
                 foreach (var pluginType in pluginTypes)
                 {
                     try
                     {
+                        if (pluginType.GetConstructor(Type.EmptyTypes) == null)
+                            throw new InvalidOperationException($"Plugin type {pluginType.FullName} requires a public parameterless constructor.");
                         var plugin = (IPlugin)Activator.CreateInstance(pluginType)!;
 
                         if (plugin.Discover())
@@ -103,5 +107,23 @@ public class PluginLoader
         }
 
         return plugins;
+    }
+
+    private IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+    {
+        try { return assembly.GetTypes(); }
+        catch (ReflectionTypeLoadException ex)
+        {
+            foreach (var loaderException in ex.LoaderExceptions.Where(item => item != null))
+                _logger.LogWarning($"Plugin type load warning: {loaderException!.Message}");
+            return ex.Types.Where(type => type != null).Cast<Type>();
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
+        _disposed = true;
     }
 }

@@ -95,6 +95,12 @@ public interface IPluginManifest
     IEnumerable<string> Dependencies { get; }
 }
 
+/// <summary>Optional core-version compatibility requirement for a plugin manifest.</summary>
+public interface ICoreVersionRequirement
+{
+    string MinimumCoreVersion { get; }
+}
+
 /// <summary>
 /// Plugin context interface - provides access to core services.
 /// </summary>

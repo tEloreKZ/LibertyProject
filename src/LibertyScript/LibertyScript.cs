@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using GTA;
-using GTA.Native;
 using GTA.UI;
 using ProjectLiberty.Abstractions.UI;
 using ProjectLiberty.Core;
@@ -16,11 +15,13 @@ public class LibertyScript : Script
 {
     private ServiceBootstrap? _bootstrap;
     private Application? _application;
+    private ServiceContainer? _container;
     private bool _initialized = false;
 
     public LibertyScript()
     {
         Tick += OnTick;
+        KeyDown += OnKeyDown;
         Aborted += OnAborted;
 
         // Initialize on script start
@@ -37,10 +38,10 @@ public class LibertyScript : Script
             _bootstrap = new ServiceBootstrap(baseDirectory);
 
             // Configure services
-            var container = _bootstrap.ConfigureServices();
+            _container = _bootstrap.ConfigureServices();
 
             // Get application
-            _application = container.GetService<Application>();
+            _application = _container.GetService<Application>();
 
             if (_application == null)
             {
@@ -55,7 +56,7 @@ public class LibertyScript : Script
             _application.Run();
 
             // Create test menu
-            CreateTestMenu(container);
+            CreateTestMenu(_container);
 
             _initialized = true;
 
@@ -111,43 +112,9 @@ public class LibertyScript : Script
         try
         {
             // Update menu manager
+            _application.GetContainer().GetService<ProjectLiberty.Abstractions.GameHost.IGameLoop>().Tick();
             var menuManager = _application.GetContainer().GetService<IMenuManager>();
             menuManager?.Update();
-
-            // Toggle menu with F2 key
-            if (Game.IsKeyDown(System.Windows.Forms.Keys.F2))
-            {
-                Debug.WriteLine("F2 pressed");
-
-                var menuManager2 = _application.GetContainer().GetService<IMenuManager>();
-                if (menuManager2 == null)
-                {
-                    Debug.WriteLine("MenuManager is null");
-                    return;
-                }
-
-                var mainMenu = menuManager2.GetMenu("liberty_main");
-                if (mainMenu == null)
-                {
-                    Debug.WriteLine("Main menu is null");
-                    return;
-                }
-
-                Debug.WriteLine($"Menu visibility before: {mainMenu.IsVisible}");
-
-                if (mainMenu.IsVisible)
-                {
-                    menuManager2.HideMenu("liberty_main");
-                    Debug.WriteLine("Menu hidden");
-                }
-                else
-                {
-                    menuManager2.ShowMenu("liberty_main");
-                    Debug.WriteLine("Menu shown");
-                }
-
-                Debug.WriteLine($"Menu visibility after: {mainMenu.IsVisible}");
-            }
         }
         catch (Exception ex)
         {
@@ -156,8 +123,34 @@ public class LibertyScript : Script
         }
     }
 
+    private void OnKeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+    {
+        if (!_initialized || _application == null) return;
+
+        var modifiers = ProjectLiberty.Abstractions.GameHost.ModifierKeys.None;
+        if (e.Shift) modifiers |= ProjectLiberty.Abstractions.GameHost.ModifierKeys.Shift;
+        if (e.Control) modifiers |= ProjectLiberty.Abstractions.GameHost.ModifierKeys.Control;
+        if (e.Alt) modifiers |= ProjectLiberty.Abstractions.GameHost.ModifierKeys.Alt;
+        _application.GetContainer().GetService<ProjectLiberty.Abstractions.GameHost.IGameLoop>().ProcessInput(
+            new ProjectLiberty.Abstractions.GameHost.InputState { IsPressed = true, KeyCode = (int)e.KeyCode, Modifiers = modifiers });
+
+        if (e.KeyCode != System.Windows.Forms.Keys.F2) return;
+        var menuManager = _application.GetContainer().GetService<IMenuManager>();
+        var mainMenu = menuManager.GetMenu("liberty_main");
+        if (mainMenu == null) return;
+        if (mainMenu.IsVisible) menuManager.HideMenu(mainMenu.Id);
+        else menuManager.ShowMenu(mainMenu.Id);
+    }
+
     private void OnAborted(object sender, EventArgs e)
     {
-        _application?.Shutdown();
+        try { _application?.Shutdown(); }
+        finally
+        {
+            _container?.Dispose();
+            _container = null;
+            _application = null;
+            _initialized = false;
+        }
     }
 }

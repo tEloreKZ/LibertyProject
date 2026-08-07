@@ -29,7 +29,7 @@ public class TestPlugin : IPlugin
 
     public void Initialize()
     {
-        if (_context == null) return;
+        if (_context == null || _logger == null) return;
 
         _logger.LogInformation($"GameHost type: {_context.GameHost.GetType().Name}");
         _logger.LogInformation($"NativeBridge type: {_context.GameHost.NativeBridge.GetType().Name}");

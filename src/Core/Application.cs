@@ -34,28 +34,32 @@ public class Application : IDisposable
 
     public void Initialize()
     {
+        ThrowIfDisposed();
         if (_initialized)
             return;
 
         _logger.LogInformation("Initializing Project Liberty...");
 
-        // Initialize game host
-        _gameHost.Initialize();
-
-        // Discover and load plugins
-        _logger.LogInformation("Initializing plugins...");
-        var discoveredPlugins = _pluginLoader.DiscoverPlugins();
-        _pluginManager.LoadPlugins(discoveredPlugins);
-
-        // Initialize plugins
-        _pluginManager.InitializePlugins();
-
-        _initialized = true;
-        _logger.LogInformation("Project Liberty initialized");
+        try
+        {
+            _gameHost.Initialize();
+            var discoveredPlugins = _pluginLoader.DiscoverPlugins();
+            _pluginManager.LoadPlugins(discoveredPlugins);
+            _pluginManager.InitializePlugins();
+            _initialized = true;
+            _logger.LogInformation("Project Liberty initialized");
+        }
+        catch
+        {
+            _pluginManager.Dispose();
+            _gameHost.Shutdown();
+            throw;
+        }
     }
 
     public void Run()
     {
+        ThrowIfDisposed();
         if (!_initialized)
             throw new InvalidOperationException("Application not initialized");
 
@@ -63,23 +67,22 @@ public class Application : IDisposable
             return;
 
         _logger.LogInformation("Starting Project Liberty...");
+        _pluginManager.EnablePlugins();
         _running = true;
     }
 
     public void Shutdown()
     {
-        if (!_initialized || !_running)
+        if (!_initialized)
             return;
 
         _logger.LogInformation("Shutting down Project Liberty...");
 
-        // Shutdown game host
+        _pluginManager.Dispose();
         _gameHost.Shutdown();
 
-        // Dispose plugin manager
-        _pluginManager?.Dispose();
-
         _running = false;
+        _initialized = false;
         _logger.LogInformation("Project Liberty shut down");
     }
 
@@ -90,12 +93,16 @@ public class Application : IDisposable
 
         Shutdown();
 
-        _pluginManager?.Dispose();
         _disposed = true;
     }
 
     public IServiceContainer GetContainer()
     {
         return _container;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed) throw new ObjectDisposedException(nameof(Application));
     }
 }

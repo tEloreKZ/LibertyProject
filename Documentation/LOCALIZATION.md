@@ -21,7 +21,9 @@
 
 Project Liberty requires full multi-language support. All text must be stored outside code, allowing for easy translation and language switching without code modifications.
 
-### Supported Languages
+### Planned Language Set
+
+The repository currently ships English (`en`) and Russian (`ru`) resources. The remaining entries are planned and require translation files before they are supported:
 
 - English (en)
 - Russian (ru)
@@ -663,7 +665,7 @@ public void TestAllLanguages()
 
 The Localization System provides:
 
-- **Complete multi-language support** for 11+ languages
+- **Extensible multi-language support** (English and Russian currently shipped; additional languages planned)
 - **No hardcoded strings** in code
 - **Hierarchical key structure** for organization
 - **Plugin localization** for third-party plugins

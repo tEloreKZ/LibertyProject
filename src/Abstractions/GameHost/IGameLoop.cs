@@ -34,6 +34,12 @@ public interface IGameLoop
     /// Stops the game loop.
     /// </summary>
     void Stop();
+
+    /// <summary>Advances the loop once on the caller's thread.</summary>
+    void Tick();
+
+    /// <summary>Dispatches input on the caller's thread.</summary>
+    void ProcessInput(InputState inputState);
     
     /// <summary>
     /// Registers a tick handler.

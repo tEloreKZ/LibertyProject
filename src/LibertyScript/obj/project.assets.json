@@ -89,7 +89,8 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.8",
         "dependencies": {
-          "ProjectLiberty.Abstractions": "1.0.0"
+          "ProjectLiberty.Abstractions": "1.0.0",
+          "ScriptHookVDotNet3": "3.6.0"
         },
         "compile": {
           "bin/placeholder/ProjectLiberty.GameHost.dll": {}
@@ -288,6 +289,9 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreLockProperties": {
+        "restoreLockedMode": true
       },
       "restoreAuditProperties": {
         "enableAudit": "true",

@@ -45,7 +45,7 @@ public class NativeBridge : INativeBridge
 
     public string GetGameVersion()
     {
-        return "1.0.0.0";
+        return _useScriptHook ? GTA.Game.Version.ToString() : "Mock";
     }
 
     public ulong GetScriptHash(string nativeName)

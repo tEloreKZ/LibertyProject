@@ -9,6 +9,7 @@ namespace ProjectLiberty.EventBus;
 public class EventBus : IEventBus, IDisposable
 {
     private readonly Dictionary<Type, List<EventHandlerRegistration>> _handlers = new Dictionary<Type, List<EventHandlerRegistration>>();
+    private readonly object _sync = new object();
     private readonly ILogger _logger;
     private bool _disposed;
 
@@ -34,15 +35,16 @@ public class EventBus : IEventBus, IDisposable
 
     public void Subscribe<TEvent>(IEventHandler<TEvent> handler, IEventFilter<TEvent>? filter, EventPriority priority) where TEvent : IEvent
     {
+        if (handler == null) throw new ArgumentNullException(nameof(handler));
+        ThrowIfDisposed();
         var eventType = typeof(TEvent);
-
-        if (!_handlers.ContainsKey(eventType))
+        lock (_sync)
         {
-            _handlers[eventType] = new List<EventHandlerRegistration>();
+            if (!_handlers.ContainsKey(eventType))
+                _handlers[eventType] = new List<EventHandlerRegistration>();
+            _handlers[eventType].Add(new EventHandlerRegistration(handler, filter, priority));
+            _handlers[eventType].Sort((a, b) => b.Priority.CompareTo(a.Priority));
         }
-
-        _handlers[eventType].Add(new EventHandlerRegistration(handler, filter, priority));
-        _handlers[eventType].Sort((a, b) => b.Priority.CompareTo(a.Priority)); // Sort by priority (highest first)
         _logger.LogDebug($"Subscribed to event: {eventType.Name} with priority: {priority}");
     }
 
@@ -50,18 +52,29 @@ public class EventBus : IEventBus, IDisposable
     {
         var eventType = typeof(TEvent);
 
-        if (_handlers.TryGetValue(eventType, out var handlers))
+        lock (_sync)
         {
-            handlers.RemoveAll(h => ReferenceEquals(h.Handler, handler));
-            _logger.LogDebug($"Unsubscribed from event: {eventType.Name}");
+            if (_handlers.TryGetValue(eventType, out var handlers))
+            {
+                handlers.RemoveAll(h => ReferenceEquals(h.Handler, handler));
+                if (handlers.Count == 0) _handlers.Remove(eventType);
+            }
         }
+        _logger.LogDebug($"Unsubscribed from event: {eventType.Name}");
     }
 
     public void Publish<TEvent>(TEvent @event) where TEvent : IEvent
     {
+        if (@event == null) throw new ArgumentNullException(nameof(@event));
+        ThrowIfDisposed();
         var eventType = typeof(TEvent);
 
-        if (!_handlers.TryGetValue(eventType, out var handlers) || handlers.Count == 0)
+        EventHandlerRegistration[] handlers;
+        lock (_sync)
+            handlers = _handlers.TryGetValue(eventType, out var registered)
+                ? registered.ToArray()
+                : Array.Empty<EventHandlerRegistration>();
+        if (handlers.Length == 0)
         {
             _logger.LogDebug($"No handlers for event: {eventType.Name}");
             return;
@@ -92,15 +105,20 @@ public class EventBus : IEventBus, IDisposable
 
     public async Task PublishAsync<TEvent>(TEvent @event) where TEvent : IEvent
     {
+        if (@event == null) throw new ArgumentNullException(nameof(@event));
+        ThrowIfDisposed();
         var eventType = typeof(TEvent);
 
-        if (!_handlers.TryGetValue(eventType, out var handlers) || handlers.Count == 0)
+        EventHandlerRegistration[] handlers;
+        lock (_sync)
+            handlers = _handlers.TryGetValue(eventType, out var registered)
+                ? registered.ToArray()
+                : Array.Empty<EventHandlerRegistration>();
+        if (handlers.Length == 0)
         {
             _logger.LogDebug($"No handlers for event: {eventType.Name}");
             return;
         }
-
-        var tasks = new List<Task>();
 
         foreach (var registration in handlers)
         {
@@ -113,21 +131,16 @@ public class EventBus : IEventBus, IDisposable
                 }
             }
 
-            tasks.Add(Task.Run(async () =>
+            try
             {
-                try
-                {
-                    var handler = (IEventHandler<TEvent>)registration.Handler;
-                    await handler.HandleAsync(@event);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, $"Error handling event: {eventType.Name}");
-                }
-            }));
+                var handler = (IEventHandler<TEvent>)registration.Handler;
+                await handler.HandleAsync(@event).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error handling event: {eventType.Name}");
+            }
         }
-
-        await Task.WhenAll(tasks);
     }
 
     public void Dispose()
@@ -135,8 +148,13 @@ public class EventBus : IEventBus, IDisposable
         if (_disposed)
             return;
 
-        _handlers.Clear();
+        lock (_sync) _handlers.Clear();
         _disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed) throw new ObjectDisposedException(nameof(EventBus));
     }
 
     private class EventHandlerRegistration

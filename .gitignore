@@ -1,0 +1,12 @@
+.vs/
+.idea/
+.windsurf/
+**/bin/
+**/obj/
+output/
+Logs/
+TestResults/
+*.user
+*.suo
+*.nupkg
+

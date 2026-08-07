@@ -24,7 +24,8 @@ public class ServiceContainer : IServiceContainer, IDisposable
 {
     private readonly Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
     private readonly Dictionary<Type, Func<IServiceProvider, object>> _transients = new Dictionary<Type, Func<IServiceProvider, object>>();
-    private readonly Dictionary<Type, Func<IServiceProvider, object>> _scoped = new Dictionary<Type, Func<IServiceProvider, object>>();
+    private readonly Dictionary<Type, Func<IServiceProvider, object>> _singletonFactories = new Dictionary<Type, Func<IServiceProvider, object>>();
+    private readonly object _sync = new object();
     private readonly ILogger _logger;
     private bool _disposed;
 
@@ -40,7 +41,13 @@ public class ServiceContainer : IServiceContainer, IDisposable
     /// <param name="instance">Service instance.</param>
     public void RegisterSingleton<TService>(TService instance) where TService : class
     {
-        _singletons[typeof(TService)] = instance;
+        if (instance == null) throw new ArgumentNullException(nameof(instance));
+        ThrowIfDisposed();
+        lock (_sync)
+        {
+            _singletons[typeof(TService)] = instance;
+            _singletonFactories.Remove(typeof(TService));
+        }
         _logger.LogDebug($"Registered singleton: {typeof(TService).Name}");
     }
 
@@ -51,7 +58,13 @@ public class ServiceContainer : IServiceContainer, IDisposable
     /// <param name="factory">Service factory.</param>
     public void RegisterSingleton<TService>(Func<IServiceProvider, TService> factory) where TService : class
     {
-        _singletons[typeof(TService)] = factory(this);
+        if (factory == null) throw new ArgumentNullException(nameof(factory));
+        ThrowIfDisposed();
+        lock (_sync)
+        {
+            _singletonFactories[typeof(TService)] = sp => factory(sp);
+            _singletons.Remove(typeof(TService));
+        }
         _logger.LogDebug($"Registered singleton with factory: {typeof(TService).Name}");
     }
 
@@ -64,7 +77,8 @@ public class ServiceContainer : IServiceContainer, IDisposable
         where TService : class
         where TImplementation : class, TService
     {
-        _transients[typeof(TService)] = sp => Activator.CreateInstance(typeof(TImplementation))!;
+        ThrowIfDisposed();
+        _transients[typeof(TService)] = _ => CreateInstance(typeof(TImplementation));
         _logger.LogDebug($"Registered transient: {typeof(TService).Name} -> {typeof(TImplementation).Name}");
     }
 
@@ -75,6 +89,8 @@ public class ServiceContainer : IServiceContainer, IDisposable
     /// <param name="factory">Service factory.</param>
     public void RegisterTransient<TService>(Func<IServiceProvider, TService> factory) where TService : class
     {
+        if (factory == null) throw new ArgumentNullException(nameof(factory));
+        ThrowIfDisposed();
         _transients[typeof(TService)] = factory;
         _logger.LogDebug($"Registered transient with factory: {typeof(TService).Name}");
     }
@@ -96,9 +112,20 @@ public class ServiceContainer : IServiceContainer, IDisposable
     /// <returns>Service instance.</returns>
     public object GetService(Type serviceType)
     {
-        if (_singletons.TryGetValue(serviceType, out var singleton))
+        if (serviceType == null) throw new ArgumentNullException(nameof(serviceType));
+        ThrowIfDisposed();
+        lock (_sync)
         {
-            return singleton;
+            if (_singletons.TryGetValue(serviceType, out var singleton))
+                return singleton;
+
+            if (_singletonFactories.TryGetValue(serviceType, out var singletonFactory))
+            {
+                singleton = singletonFactory(this);
+                _singletons[serviceType] = singleton;
+                _singletonFactories.Remove(serviceType);
+                return singleton;
+            }
         }
 
         if (_transients.TryGetValue(serviceType, out var transientFactory))
@@ -116,7 +143,8 @@ public class ServiceContainer : IServiceContainer, IDisposable
     /// <returns>True if registered, false otherwise.</returns>
     public bool IsRegistered(Type serviceType)
     {
-        return _singletons.ContainsKey(serviceType) || _transients.ContainsKey(serviceType);
+        lock (_sync)
+            return _singletons.ContainsKey(serviceType) || _singletonFactories.ContainsKey(serviceType) || _transients.ContainsKey(serviceType);
     }
 
     public void Dispose()
@@ -124,7 +152,9 @@ public class ServiceContainer : IServiceContainer, IDisposable
         if (_disposed)
             return;
 
-        foreach (var singleton in _singletons.Values)
+        object[] singletons;
+        lock (_sync) singletons = _singletons.Values.Distinct(ReferenceEqualityComparer.Instance).ToArray();
+        foreach (var singleton in singletons.Reverse())
         {
             if (singleton is IDisposable disposable)
             {
@@ -133,7 +163,34 @@ public class ServiceContainer : IServiceContainer, IDisposable
         }
 
         _singletons.Clear();
+        _singletonFactories.Clear();
         _transients.Clear();
         _disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed) throw new ObjectDisposedException(nameof(ServiceContainer));
+    }
+
+    private object CreateInstance(Type implementationType)
+    {
+        var constructors = implementationType.GetConstructors()
+            .OrderByDescending(constructor => constructor.GetParameters().Length);
+        foreach (var constructor in constructors)
+        {
+            var parameters = constructor.GetParameters();
+            if (!parameters.All(parameter => IsRegistered(parameter.ParameterType))) continue;
+            var arguments = parameters.Select(parameter => GetService(parameter.ParameterType)).ToArray();
+            return constructor.Invoke(arguments);
+        }
+        throw new InvalidOperationException($"No resolvable public constructor found for {implementationType.Name}");
+    }
+
+    private sealed class ReferenceEqualityComparer : IEqualityComparer<object>
+    {
+        public static readonly ReferenceEqualityComparer Instance = new ReferenceEqualityComparer();
+        public new bool Equals(object? x, object? y) => ReferenceEquals(x, y);
+        public int GetHashCode(object obj) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
     }
 }

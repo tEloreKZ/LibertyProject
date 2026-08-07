@@ -33,6 +33,9 @@
             "NU1605"
           ]
         },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
+        },
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
@@ -78,6 +81,9 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
         },
         "restoreAuditProperties": {
           "enableAudit": "true",

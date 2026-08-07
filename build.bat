@@ -6,7 +6,7 @@ dotnet --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo ERROR: .NET SDK is not installed.
     echo Please install .NET 8.0 SDK from: https://dotnet.microsoft.com/download/dotnet/8.0
-    pause
+    if not defined CI pause
     exit /b 1
 )
 
@@ -14,7 +14,7 @@ echo Restoring packages...
 dotnet restore
 if %errorlevel% neq 0 (
     echo ERROR: Failed to restore packages
-    pause
+    if not defined CI pause
     exit /b 1
 )
 
@@ -22,7 +22,15 @@ echo Building solution...
 dotnet build --configuration Release
 if %errorlevel% neq 0 (
     echo ERROR: Failed to build solution
-    pause
+    if not defined CI pause
+    exit /b 1
+)
+
+echo Running tests...
+dotnet test "Tests\ProjectLiberty.Tests.csproj" --configuration Release --no-build --no-restore
+if %errorlevel% neq 0 (
+    echo ERROR: Tests failed
+    if not defined CI pause
     exit /b 1
 )
 
@@ -38,25 +46,22 @@ copy "src\PluginSystem\bin\Release\net48\ProjectLiberty.PluginSystem.dll" "outpu
 copy "src\Localization\bin\Release\net48\ProjectLiberty.Localization.dll" "output\" >nul
 copy "src\Configuration\bin\Release\net48\ProjectLiberty.Configuration.dll" "output\" >nul
 copy "src\Logging\bin\Release\net48\ProjectLiberty.Logging.dll" "output\" >nul
-copy "src\EntryPoint\bin\Release\net48\ProjectLiberty.EntryPoint.dll" "output\" >nul
 copy "src\EntryPoint\bin\Release\net48\ProjectLiberty.EntryPoint.exe" "output\" >nul
+copy "src\EntryPoint\bin\Release\net48\ProjectLiberty.EntryPoint.exe.config" "output\" >nul
 
 if exist "src\LibertyScript\bin\Release\net48\LibertyScript.dll" (
     copy "src\LibertyScript\bin\Release\net48\LibertyScript.dll" "output\" >nul
 )
 
-if exist "Plugins\ExamplePlugin\bin\Release\net48\ExamplePlugin.dll" (
-    copy "Plugins\ExamplePlugin\bin\Release\net48\ExamplePlugin.dll" "output\" >nul
-)
-
 echo Copying Newtonsoft.Json.dll...
-for /r "src" %%f in (Newtonsoft.Json.dll) do (
-    if exist "%%f" (
-        copy "%%f" "output\" >nul
-        goto :found
-    )
+copy "src\LibertyScript\bin\Release\net48\Newtonsoft.Json.dll" "output\" >nul
+copy "src\LibertyScript\bin\Release\net48\ScriptHookVDotNet3.dll" "output\" >nul
+
+if exist "Plugins\TestPlugin\bin\Release\net48\TestPlugin.dll" (
+    mkdir "output\Plugins"
+    mkdir "output\Plugins\TestPlugin"
+    copy "Plugins\TestPlugin\bin\Release\net48\TestPlugin.dll" "output\Plugins\TestPlugin\" >nul
 )
-:found
 
 echo Copying configuration files...
 mkdir "output\Config"
@@ -88,13 +93,11 @@ copy "src\Logging\bin\Release\net48\ProjectLiberty.Logging.dll" "output\scripts\
 copy "src\UI\bin\Release\net48\ProjectLiberty.UI.dll" "output\scripts\ProjectLiberty\Core\" >nul
 
 echo Copying Newtonsoft.Json.dll to Core...
-for /r "src" %%f in (Newtonsoft.Json.dll) do (
-    if exist "%%f" (
-        copy "%%f" "output\scripts\ProjectLiberty\Core\" >nul
-        goto :found_core
-    )
+copy "src\LibertyScript\bin\Release\net48\Newtonsoft.Json.dll" "output\scripts\ProjectLiberty\Core\" >nul
+
+if exist "src\LibertyScript\bin\Release\net48\ScriptHookVDotNet3.dll" (
+    copy "src\LibertyScript\bin\Release\net48\ScriptHookVDotNet3.dll" "output\scripts\ProjectLiberty\Core\" >nul
 )
-:found_core
 
 if exist "src\LibertyScript\bin\Release\net48\LibertyScript.dll" (
     copy "src\LibertyScript\bin\Release\net48\LibertyScript.dll" "output\scripts\" >nul
@@ -134,4 +137,4 @@ echo Build completed successfully!
 echo.
 echo All files copied to: output\
 echo.
-pause
+if not defined CI pause

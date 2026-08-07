@@ -21,7 +21,7 @@ public class EntityManager : IEntityManager
 
     public IEnumerable<IEntity> GetAllEntities()
     {
-        return _entities.Values;
+        return _entities.Values.ToArray();
     }
 
     public IEntity? GetEntity(int handle)
@@ -45,8 +45,9 @@ public class EntityManager : IEntityManager
 
     public void DeleteEntity(int handle)
     {
-        if (_entities.Remove(handle))
+        if (_entities.TryGetValue(handle, out var entity) && _entities.Remove(handle))
         {
+            entity.Delete();
             _logger.LogDebug($"Deleted entity with handle {handle}");
         }
     }

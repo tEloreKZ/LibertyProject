@@ -3,84 +3,49 @@ using ProjectLiberty.Abstractions.Plugins;
 
 namespace ProjectLiberty.PluginSystem;
 
-/// <summary>
-/// Checks plugin version compatibility.
-/// </summary>
-public class VersionChecker
+/// <summary>Validates plugin versions and optional minimum-core requirements.</summary>
+public sealed class VersionChecker
 {
     private readonly ILogger _logger;
-    private readonly string _coreVersion;
+    private readonly Version _coreVersion;
 
     public VersionChecker(ILogger logger, string coreVersion)
     {
-        _logger = logger;
-        _coreVersion = coreVersion;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        if (!Version.TryParse(coreVersion, out _coreVersion!))
+            throw new ArgumentException("Core version must be valid.", nameof(coreVersion));
     }
 
-    /// <summary>
-    /// Checks if a plugin is compatible with the current core version.
-    /// </summary>
-    /// <param name="plugin">Plugin to check.</param>
-    /// <returns>True if compatible, false otherwise.</returns>
     public bool IsCompatible(IPlugin plugin)
     {
-        var pluginVersion = plugin.Manifest.Version;
-        var pluginName = plugin.Manifest.Name;
-
-        _logger.LogDebug($"Checking compatibility for {pluginName} v{pluginVersion} with core v{_coreVersion}");
-
-        // Simple version check - plugin must have same major version
-        var coreMajor = GetMajorVersion(_coreVersion);
-        var pluginMajor = GetMajorVersion(pluginVersion);
-
-        if (coreMajor != pluginMajor)
+        if (plugin == null) throw new ArgumentNullException(nameof(plugin));
+        if (!Version.TryParse(plugin.Manifest.Version, out _))
         {
-            _logger.LogWarning($"Plugin {pluginName} v{pluginVersion} is not compatible with core v{_coreVersion} (major version mismatch)");
+            _logger.LogWarning($"Plugin {plugin.Manifest.Name} has invalid version '{plugin.Manifest.Version}'");
             return false;
         }
 
-        _logger.LogDebug($"Plugin {pluginName} v{pluginVersion} is compatible with core v{_coreVersion}");
+        if (plugin.Manifest is ICoreVersionRequirement requirement)
+        {
+            if (!Version.TryParse(requirement.MinimumCoreVersion, out var minimum))
+            {
+                _logger.LogWarning($"Plugin {plugin.Manifest.Name} has invalid minimum core version");
+                return false;
+            }
+            if (_coreVersion < minimum)
+            {
+                _logger.LogWarning($"Plugin {plugin.Manifest.Name} requires core {minimum} or newer");
+                return false;
+            }
+        }
         return true;
     }
 
-    /// <summary>
-    /// Checks compatibility for multiple plugins.
-    /// </summary>
-    /// <param name="plugins">Plugins to check.</param>
-    /// <returns>Compatible plugins.</returns>
     public List<IPlugin> FilterCompatible(IEnumerable<IPlugin> plugins)
     {
-        var compatible = new List<IPlugin>();
-
-        foreach (var plugin in plugins)
-        {
-            if (IsCompatible(plugin))
-            {
-                compatible.Add(plugin);
-            }
-        }
-
-        _logger.LogInformation($"Filtered {compatible.Count}/{plugins.Count()} compatible plugins");
+        var pluginList = plugins.ToList();
+        var compatible = pluginList.Where(IsCompatible).ToList();
+        _logger.LogInformation($"Filtered {compatible.Count}/{pluginList.Count} compatible plugins");
         return compatible;
-    }
-
-    /// <summary>
-    /// Extracts major version from version string.
-    /// </summary>
-    /// <param name="version">Version string (e.g., "1.2.3").</param>
-    /// <returns>Major version number.</returns>
-    private int GetMajorVersion(string version)
-    {
-        if (string.IsNullOrEmpty(version))
-            return 0;
-
-        var parts = version.Split('.');
-        if (parts.Length == 0)
-            return 0;
-
-        if (int.TryParse(parts[0], out var major))
-            return major;
-
-        return 0;
     }
 }

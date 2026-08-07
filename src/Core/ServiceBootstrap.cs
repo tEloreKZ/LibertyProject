@@ -36,10 +36,8 @@ public class ServiceBootstrap
     /// <returns>Configured service container.</returns>
     public ServiceContainer ConfigureServices()
     {
-        var container = new ServiceContainer(CreateLogger("ServiceContainer"));
-
-        // Register logging first
         var logger = CreateLogger("ProjectLiberty");
+        var container = new ServiceContainer(logger);
         container.RegisterSingleton<ILogger>(logger);
 
         // Register configuration
@@ -53,6 +51,7 @@ public class ServiceBootstrap
         var languagesDirectory = Path.Combine(_baseDirectory, "Languages");
         var localization = new LocalizationService(logger, languagesDirectory);
         localization.LoadTranslations();
+        localization.SetLanguage(configuration.GetValue("localization.defaultLanguage", "en"));
         container.RegisterSingleton<ILocalization>(localization);
 
         // Register event bus
@@ -64,6 +63,7 @@ public class ServiceBootstrap
         container.RegisterSingleton<INativeBridge>(nativeBridge);
 
         var gameLoop = new GameLoop(logger);
+        gameLoop.TickRate = configuration.GetValue("game.tickRate", 60);
         container.RegisterSingleton<IGameLoop>(gameLoop);
 
         var entityManager = new EntityManager(logger);
@@ -72,7 +72,7 @@ public class ServiceBootstrap
         var worldManager = new WorldManager(logger);
         container.RegisterSingleton<IWorldManager>(worldManager);
 
-        var nativeInvoker = new NativeInvoker(logger, nativeBridge);
+        var nativeInvoker = new NativeInvoker(logger, nativeBridge, useScriptHook: !_useMockHost);
         container.RegisterSingleton<INativeInvoker>(nativeInvoker);
 
         // Register game host

@@ -35,6 +35,7 @@ This will:
 cd G:\ProjectLiberty\LibertyProject
 dotnet restore
 dotnet build --configuration Release
+dotnet test Tests\ProjectLiberty.Tests.csproj --configuration Release --no-build --no-restore
 ```
 
 ### Using Visual Studio
@@ -85,10 +86,10 @@ Ensure these files exist in the application directory:
 
 ## Plugin Development
 
-To build the example plugin:
+To build the test plugin:
 
 ```bash
-cd Plugins\ExamplePlugin
+cd Plugins\TestPlugin
 dotnet build --configuration Release
 ```
 

@@ -13,6 +13,8 @@ public class PluginManager : IDisposable
     private readonly IPluginContext _pluginContext;
     private readonly DependencyResolver _dependencyResolver;
     private readonly VersionChecker _versionChecker;
+    private readonly HashSet<string> _initialized = new HashSet<string>();
+    private readonly HashSet<string> _enabled = new HashSet<string>();
     private bool _disposed;
 
     public PluginManager(ILogger logger, IPluginContext pluginContext)
@@ -29,7 +31,14 @@ public class PluginManager : IDisposable
     /// <param name="plugin">Plugin to load.</param>
     public void LoadPlugin(IPlugin plugin)
     {
+        ThrowIfDisposed();
+        if (plugin == null) throw new ArgumentNullException(nameof(plugin));
         var pluginId = plugin.Manifest.Id;
+        if (string.IsNullOrWhiteSpace(pluginId))
+        {
+            _logger.LogWarning("Plugin with empty ID was rejected");
+            return;
+        }
 
         if (_plugins.ContainsKey(pluginId))
         {
@@ -98,7 +107,9 @@ public class PluginManager : IDisposable
         {
             try
             {
+                if (_initialized.Contains(plugin.Manifest.Id)) continue;
                 plugin.Initialize();
+                _initialized.Add(plugin.Manifest.Id);
                 _logger.LogDebug($"Initialized plugin: {plugin.Manifest.Name}");
             }
             catch (Exception ex)
@@ -116,6 +127,7 @@ public class PluginManager : IDisposable
     /// <param name="pluginId">Plugin ID.</param>
     public void EnablePlugin(string pluginId)
     {
+        ThrowIfDisposed();
         if (!_plugins.TryGetValue(pluginId, out var plugin))
         {
             _logger.LogWarning($"Plugin not found: {pluginId}");
@@ -124,7 +136,11 @@ public class PluginManager : IDisposable
 
         try
         {
+            if (!_initialized.Contains(pluginId))
+                throw new InvalidOperationException($"Plugin is not initialized: {pluginId}");
+            if (_enabled.Contains(pluginId)) return;
             plugin.Enable();
+            _enabled.Add(pluginId);
             _logger.LogInformation($"Enabled plugin: {plugin.Manifest.Name}");
         }
         catch (Exception ex)
@@ -147,7 +163,9 @@ public class PluginManager : IDisposable
 
         try
         {
+            if (!_enabled.Contains(pluginId)) return;
             plugin.Disable();
+            _enabled.Remove(pluginId);
             _logger.LogInformation($"Disabled plugin: {plugin.Manifest.Name}");
         }
         catch (Exception ex)
@@ -170,8 +188,14 @@ public class PluginManager : IDisposable
 
         try
         {
+            if (_enabled.Contains(pluginId))
+            {
+                try { plugin.Disable(); }
+                finally { _enabled.Remove(pluginId); }
+            }
             plugin.Unload();
             _plugins.Remove(pluginId);
+            _initialized.Remove(pluginId);
             _logger.LogInformation($"Unloaded plugin: {plugin.Manifest.Name}");
         }
         catch (Exception ex)
@@ -196,7 +220,13 @@ public class PluginManager : IDisposable
     /// <returns>All loaded plugins.</returns>
     public IEnumerable<IPlugin> GetAllPlugins()
     {
-        return _plugins.Values;
+        return _plugins.Values.ToArray();
+    }
+
+    public void EnablePlugins()
+    {
+        ThrowIfDisposed();
+        foreach (var pluginId in _plugins.Keys.ToArray()) EnablePlugin(pluginId);
     }
 
     public void Dispose()
@@ -210,15 +240,28 @@ public class PluginManager : IDisposable
         {
             try
             {
-                plugin.Unload();
+                if (_enabled.Contains(plugin.Manifest.Id))
+                {
+                    try { plugin.Disable(); }
+                    catch (Exception ex) { _logger.LogError(ex, $"Failed to disable plugin: {plugin.Manifest.Id}"); }
+                }
+                try { plugin.Unload(); }
+                catch (Exception ex) { _logger.LogError(ex, $"Failed to unload plugin: {plugin.Manifest.Id}"); }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to unload plugin: {plugin.Manifest.Id}");
+                _logger.LogError(ex, $"Failed to clean up plugin: {plugin.Manifest.Id}");
             }
         }
 
         _plugins.Clear();
+        _initialized.Clear();
+        _enabled.Clear();
         _disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed) throw new ObjectDisposedException(nameof(PluginManager));
     }
 }

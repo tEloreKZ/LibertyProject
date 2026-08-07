@@ -33,6 +33,9 @@
             "NU1605"
           ]
         },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
+        },
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
@@ -78,6 +81,9 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
         },
         "restoreAuditProperties": {
           "enableAudit": "true",
@@ -152,6 +158,9 @@
             "NU1605"
           ]
         },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
+        },
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
@@ -200,6 +209,9 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
         },
         "restoreAuditProperties": {
           "enableAudit": "true",
@@ -252,6 +264,9 @@
             "NU1605"
           ]
         },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
+        },
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
@@ -298,6 +313,9 @@
             "NU1605"
           ]
         },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
+        },
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
@@ -307,6 +325,12 @@
       "frameworks": {
         "net48": {
           "targetAlias": "net48",
+          "dependencies": {
+            "ScriptHookVDotNet3": {
+              "target": "Package",
+              "version": "[3.6.0, )"
+            }
+          },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423\\RuntimeIdentifierGraph.json"
         }
       }
@@ -343,6 +367,9 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
         },
         "restoreAuditProperties": {
           "enableAudit": "true",
@@ -396,6 +423,9 @@
             "NU1605"
           ]
         },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
+        },
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
@@ -442,6 +472,9 @@
             "NU1605"
           ]
         },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
+        },
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
@@ -487,6 +520,9 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreLockProperties": {
+          "restoreLockedMode": true
         },
         "restoreAuditProperties": {
           "enableAudit": "true",

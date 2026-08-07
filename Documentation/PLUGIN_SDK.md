@@ -1,5 +1,7 @@
 # Plugin SDK
 
+> Security note: plugins currently run as trusted in-process .NET code. `IPluginContext` is an API boundary, not a sandbox, and loaded assemblies cannot be fully unloaded on .NET Framework without restarting the host.
+
 **Plugin Development Guide for Project Liberty**
 
 ---

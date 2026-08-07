@@ -17,6 +17,7 @@ public class Logger : ILogger, IDisposable
     private string? _currentLogFile;
     private LogLevel _minimumLevel = LogLevel.Information;
     private bool _disposed;
+    private readonly object _sync = new object();
 
     public Logger(string categoryName, string logDirectory, bool logToFile = true, bool logToConsole = true, int maxLogFiles = 10, int maxLogFileSizeMB = 10)
     {
@@ -71,6 +72,7 @@ public class Logger : ILogger, IDisposable
 
     public void Log(LogLevel level, string message)
     {
+        if (_disposed) return;
         if (level < _minimumLevel)
         {
             return;
@@ -79,27 +81,18 @@ public class Logger : ILogger, IDisposable
         var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff");
         var logMessage = $"[{timestamp}] [{level}] [{_categoryName}] {message}";
 
-        if (_logToConsole)
+        lock (_sync)
         {
-            Console.WriteLine(logMessage);
-        }
-
-        if (_logToFile && _fileWriter != null)
-        {
-            try
+            if (_logToConsole) Console.WriteLine(logMessage);
+            if (_logToFile && _fileWriter != null)
             {
-                _fileWriter.WriteLine(logMessage);
-                _fileWriter.Flush();
-
-                // Check file size
-                if (_fileWriter.BaseStream.Length > _maxLogFileSizeMB * 1024 * 1024)
+                try
                 {
-                    RotateLogFile();
+                    _fileWriter.WriteLine(logMessage);
+                    _fileWriter.Flush();
+                    if (_fileWriter.BaseStream.Length > _maxLogFileSizeMB * 1024L * 1024L) RotateLogFile();
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to write to log file: {ex.Message}");
+                catch (Exception ex) { Console.WriteLine($"Failed to write to log file: {ex.Message}"); }
             }
         }
     }
@@ -139,7 +132,7 @@ public class Logger : ILogger, IDisposable
 
     private void RotateLogFile()
     {
-        _fileWriter?.Dispose();
+        lock (_sync) _fileWriter?.Dispose();
         InitializeFileLogging();
     }
 

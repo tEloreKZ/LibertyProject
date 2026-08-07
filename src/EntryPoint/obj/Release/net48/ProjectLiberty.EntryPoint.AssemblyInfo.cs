@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProjectLiberty.EntryPoint")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+64ae1289ff0d2bde8d1691d66550fb11b9fa8429")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f89f668d50df24e549e678d10b5e604f4253356d")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProjectLiberty.EntryPoint")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProjectLiberty.EntryPoint")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
